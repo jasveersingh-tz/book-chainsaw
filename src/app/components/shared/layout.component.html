@@ -1,0 +1,64 @@
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar Navigation -->
+    <nav class="w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white flex flex-col">
+        <div class="p-6 border-b border-blue-700">
+            <h1 class="text-2xl font-bold">📚 Library</h1>
+            <p class="text-blue-200 text-sm mt-1">Management System</p>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-2">
+            <a routerLink="/dashboard"
+                class="block px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                📊 Dashboard
+            </a>
+
+            <a routerLink="/inventory"
+                class="block px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                📦 Inventory
+            </a>
+
+            <a routerLink="/pos" class="block px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                🛒 POS (Issue Books)
+            </a>
+
+            <a routerLink="/users" class="block px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                👥 Users
+            </a>
+
+            <a routerLink="/employees"
+                class="block px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                💼 Employees
+            </a>
+
+            <a routerLink="/pr-review"
+                class="block px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                🔍 PR Review
+            </a>
+        </div>
+
+        <div class="p-6 border-t border-blue-700">
+            <div *ngIf="currentEmployee" class="mb-4">
+                <p class="text-sm text-blue-200">Logged in as</p>
+                <p class="font-semibold">{{ currentEmployee.name }}</p>
+                <p class="text-xs text-blue-200">{{ currentEmployee.role | titlecase }}</p>
+            </div>
+            <button (click)="onLogout()"
+                class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition-colors">
+                🚪 Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <div class="bg-white shadow-sm border-b border-gray-200 p-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800">Welcome to Library Management System</h2>
+                <div class="text-sm text-gray-600">
+                    {{ currentTime | date: 'medium' }}
+                </div>
+            </div>
+        </div>
+        <router-outlet></router-outlet>
+    </div>
+</div>

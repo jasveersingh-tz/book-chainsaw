@@ -1,0 +1,96 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+    <h1 class="text-4xl font-bold text-gray-800 mb-8">Dashboard</h1>
+
+    <div *ngIf="dashboardData" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Books Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Total Books</p>
+                    <p class="text-3xl font-bold text-blue-600 mt-2">{{ dashboardData.totalBooks }}</p>
+                </div>
+                <div class="text-4xl text-blue-200">📚</div>
+            </div>
+        </div>
+
+        <!-- Total Users Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Total Users</p>
+                    <p class="text-3xl font-bold text-green-600 mt-2">{{ dashboardData.totalUsers }}</p>
+                </div>
+                <div class="text-4xl text-green-200">👥</div>
+            </div>
+        </div>
+
+        <!-- Total Employees Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Total Employees</p>
+                    <p class="text-3xl font-bold text-purple-600 mt-2">{{ dashboardData.totalEmployees }}</p>
+                </div>
+                <div class="text-4xl text-purple-200">💼</div>
+            </div>
+        </div>
+
+        <!-- Books Issued Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Books Issued</p>
+                    <p class="text-3xl font-bold text-orange-600 mt-2">{{ dashboardData.booksIssued }}</p>
+                </div>
+                <div class="text-4xl text-orange-200">📤</div>
+            </div>
+        </div>
+
+        <!-- Books Overdue Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Books Overdue</p>
+                    <p class="text-3xl font-bold text-red-600 mt-2">{{ dashboardData.booksOverdue }}</p>
+                </div>
+                <div class="text-4xl text-red-200">⚠️</div>
+            </div>
+        </div>
+
+        <!-- Revenue Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Revenue (Fine Amount)</p>
+                    <p class="text-3xl font-bold text-emerald-600 mt-2">₹{{ dashboardData.revenue }}</p>
+                </div>
+                <div class="text-4xl text-emerald-200">💰</div>
+            </div>
+        </div>
+
+        <!-- Active Loans Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Active Loans</p>
+                    <p class="text-3xl font-bold text-indigo-600 mt-2">{{ dashboardData.activeLoans }}</p>
+                </div>
+                <div class="text-4xl text-indigo-200">🔄</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Quick Stats</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-blue-50 rounded-lg">
+                <p class="text-gray-600 text-sm">System Status</p>
+                <p class="text-lg font-semibold text-green-600">✓ All Systems Operational</p>
+            </div>
+            <div class="p-4 bg-yellow-50 rounded-lg">
+                <p class="text-gray-600 text-sm">Last Updated</p>
+                <p class="text-lg font-semibold text-gray-700">Just now</p>
+            </div>
+        </div>
+    </div>
+</div>

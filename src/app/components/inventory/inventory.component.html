@@ -1,0 +1,87 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800">Inventory Management</h1>
+        <button (click)="toggleAddForm()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+            {{ showAddForm ? 'Cancel' : 'Add Book' }}
+        </button>
+    </div>
+
+    <!-- Add Book Form -->
+    <div *ngIf="showAddForm" class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Add New Book</h2>
+        <form (ngSubmit)="onAddBook()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input [(ngModel)]="newBook.title" name="title" placeholder="Book Title"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input [(ngModel)]="newBook.author" name="author" placeholder="Author"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input [(ngModel)]="newBook.isbn" name="isbn" placeholder="ISBN"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input [(ngModel)]="newBook.publisher" name="publisher" placeholder="Publisher"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input type="number" [(ngModel)]="newBook.publishYear" name="publishYear" placeholder="Publish Year"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input [(ngModel)]="newBook.category" name="category" placeholder="Category"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input type="number" [(ngModel)]="newBook.totalCopies" name="totalCopies" placeholder="Total Copies"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input [(ngModel)]="newBook.shelfLocation" name="shelfLocation" placeholder="Shelf Location"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input type="number" [(ngModel)]="newBook.price" name="price" placeholder="Price"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <textarea [(ngModel)]="newBook.description" name="description" placeholder="Description"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2"
+                rows="3"></textarea>
+            <button type="submit"
+                class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition-colors">
+                Add Book
+            </button>
+        </form>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <input [(ngModel)]="searchTerm" placeholder="Search by title or author..."
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+
+    <!-- Books Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-700">Title</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-700">Author</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-700">Category</th>
+                    <th class="px-6 py-3 text-center font-semibold text-gray-700">Total</th>
+                    <th class="px-6 py-3 text-center font-semibold text-gray-700">Available</th>
+                    <th class="px-6 py-3 text-center font-semibold text-gray-700">Price</th>
+                    <th class="px-6 py-3 text-center font-semibold text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let book of getFilteredBooks()" class="border-t hover:bg-gray-50">
+                    <td class="px-6 py-4 text-gray-800">{{ book.title }}</td>
+                    <td class="px-6 py-4 text-gray-800">{{ book.author }}</td>
+                    <td class="px-6 py-4 text-gray-800">{{ book.category }}</td>
+                    <td class="px-6 py-4 text-center font-semibold">{{ book.totalCopies }}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span [class]="
+                'px-3 py-1 rounded-full text-white font-semibold ' +
+                (book.availableCopies > 0 ? 'bg-green-500' : 'bg-red-500')
+              ">
+                            {{ book.availableCopies }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center text-gray-800">₹{{ book.price }}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button (click)="onDeleteBook(book.id)"
+                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold transition-colors">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
