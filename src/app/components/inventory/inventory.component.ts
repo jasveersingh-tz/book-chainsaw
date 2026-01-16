@@ -170,4 +170,8 @@ export class InventoryComponent implements OnInit, OnDestroy {
     public clearSearch(): void {
         this.searchTerm = '';
     }
+
+    public trackByBookId(index: number, book: Book): string {
+        return book.id;
+    }
 }

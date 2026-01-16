@@ -59,7 +59,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let employee of getFilteredEmployees()" class="border-t hover:bg-gray-50">
+                <tr *ngFor="let employee of getFilteredEmployees(); trackBy: trackByEmployeeId" class="border-t hover:bg-gray-50">
                     <td class="px-6 py-4 text-gray-800 font-medium">{{ employee.name }}</td>
                     <td class="px-6 py-4 text-gray-800">{{ employee.email }}</td>
                     <td class="px-6 py-4 text-gray-800">

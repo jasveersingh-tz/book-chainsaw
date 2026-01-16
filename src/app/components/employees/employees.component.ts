@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { Employee } from '../../models/index';
 import { EmployeeService } from '../../services/employee.service';
 
@@ -10,10 +11,11 @@ import { EmployeeService } from '../../services/employee.service';
     imports: [CommonModule, FormsModule],
     templateUrl: './employees.component.html',
 })
-export class EmployeesComponent implements OnInit {
+export class EmployeesComponent implements OnInit, OnDestroy {
     public employees: Employee[] = [];
     public searchTerm: string = '';
     public showAddForm: boolean = false;
+    private subscription: Subscription = new Subscription();
 
     public newEmployee: Omit<Employee, 'id'> = {
         name: '',
@@ -31,9 +33,14 @@ export class EmployeesComponent implements OnInit {
     constructor(private employeeService: EmployeeService) { }
 
     public ngOnInit(): void {
-        this.employeeService.getEmployees().subscribe((employees) => {
+        const sub = this.employeeService.getEmployees().subscribe((employees) => {
             this.employees = employees;
         });
+        this.subscription.add(sub);
+    }
+
+    public ngOnDestroy(): void {
+        this.subscription.unsubscribe();
     }
 
     public getFilteredEmployees(): Employee[] {
@@ -129,5 +136,9 @@ export class EmployeesComponent implements OnInit {
 
     public toggleAddForm(): void {
         this.showAddForm = !this.showAddForm;
+    }
+
+    public trackByEmployeeId(index: number, employee: Employee): string {
+        return employee.id;
     }
 }
