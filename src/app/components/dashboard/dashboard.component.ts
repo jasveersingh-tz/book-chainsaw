@@ -20,9 +20,7 @@ export class DashboardComponent implements OnInit {
         });
     }
 
-    public FormatDate(date: Date): string {
-        console.log('Date');
-
+    public formatDate(date: Date): string {
         return new Date(date).toLocaleDateString();
     }
 }
