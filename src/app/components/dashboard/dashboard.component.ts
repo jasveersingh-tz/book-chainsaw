@@ -19,4 +19,10 @@ export class DashboardComponent implements OnInit {
             this.dashboardData = data;
         });
     }
+
+    public FormatDate(date: Date): string {
+        console.log('Date');
+
+        return new Date(date).toLocaleDateString();
+    }
 }
