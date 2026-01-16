@@ -23,7 +23,12 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
+        continue-on-error: true
+
+      - name: Rebuild native modules
+        run: npm rebuild
+        continue-on-error: true
 
       - name: Run ESLint
         id: lint
