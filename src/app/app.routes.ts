@@ -5,7 +5,6 @@ import { InventoryComponent } from './components/inventory/inventory.component';
 import { UsersComponent } from './components/users/users.component';
 import { EmployeesComponent } from './components/employees/employees.component';
 import { PosComponent } from './components/pos/pos.component';
-import { PrReviewComponent } from './components/pos/pr-review.component';
 import { LayoutComponent } from './components/shared/layout.component';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -22,7 +21,6 @@ export const routes: Routes = [
             { path: 'users', component: UsersComponent },
             { path: 'employees', component: EmployeesComponent },
             { path: 'pos', component: PosComponent },
-            { path: 'pr-review', component: PrReviewComponent },
         ],
     },
     { path: '**', redirectTo: '/login' },

@@ -90,7 +90,7 @@ export class BookIssueService {
         this.bookIssuesSubject.next([...this.mockBookIssues]);
     }
 
-    public returnBook(issueId: string, employeeId: string): void {
+    public returnBook(issueId: string, _employeeId: string): void {
         const issue = this.getBookIssueById(issueId);
         if (!issue) {
             throw new Error('Book issue not found');

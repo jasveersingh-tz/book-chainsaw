@@ -1,0 +1,124 @@
+{
+  "sonarcloud": {
+    "organization": "your-org",
+    "projectKey": "your-org_book-chainsaw",
+    "projectName": "Library Management System - Book Chainsaw",
+    "sources": "src",
+    "exclusions": ["**/*.spec.ts", "**/node_modules/**", "**/dist/**", "**/.angular/**"]
+  },
+  "qualityGates": {
+    "gates": [
+      {
+        "metric": "bugs",
+        "operator": "LESS_THAN",
+        "value": 0,
+        "error": 1
+      },
+      {
+        "metric": "vulnerabilities",
+        "operator": "LESS_THAN",
+        "value": 0,
+        "error": 1
+      },
+      {
+        "metric": "coverage",
+        "operator": "GREATER_THAN_OR_EQUAL",
+        "value": 80,
+        "error": 15
+      },
+      {
+        "metric": "code_smells",
+        "operator": "LESS_THAN_OR_EQUAL",
+        "value": 10,
+        "error": 5
+      },
+      {
+        "metric": "duplicated_lines_density",
+        "operator": "LESS_THAN_OR_EQUAL",
+        "value": 3,
+        "error": 5
+      },
+      {
+        "metric": "cognitive_complexity",
+        "operator": "LESS_THAN_OR_EQUAL",
+        "value": 15,
+        "error": 20
+      }
+    ]
+  },
+  "securityRules": {
+    "critical": [
+      "No hardcoded credentials (passwords, API keys, tokens)",
+      "No SQL injection vulnerabilities",
+      "No Cross-Site Scripting (XSS) vulnerabilities",
+      "No hardcoded database URLs",
+      "No insecure cryptographic algorithms"
+    ],
+    "high": [
+      "Proper input validation",
+      "No command injection risks",
+      "Secure error handling",
+      "No information disclosure",
+      "Proper access control"
+    ],
+    "medium": [
+      "Code comments for sensitive areas",
+      "Logging without sensitive data",
+      "Proper null checks",
+      "Resource cleanup",
+      "Thread safety"
+    ]
+  },
+  "reliabilityRules": {
+    "critical": [
+      "No null pointer exceptions",
+      "No uncaught exceptions",
+      "Resource cleanup in finally blocks",
+      "Array bounds checking",
+      "Type safety in casts"
+    ],
+    "high": [
+      "Proper error handling",
+      "No infinite loops",
+      "Collection size checks",
+      "Numeric overflow prevention",
+      "Race condition prevention"
+    ]
+  },
+  "maintainabilityRules": {
+    "critical": [
+      "Cognitive complexity < 15 per method",
+      "Line length < 120 characters",
+      "Method length < 50 lines",
+      "Class length < 200 lines",
+      "No code duplication"
+    ],
+    "high": [
+      "Clear naming conventions",
+      "Single responsibility principle",
+      "DRY principle",
+      "SOLID principles",
+      "Design patterns usage"
+    ]
+  },
+  "testingRequirements": {
+    "coverage": {
+      "overall": "≥80%",
+      "critical": "100%",
+      "high": "≥95%",
+      "medium": "≥85%"
+    },
+    "testTypes": [
+      "Unit tests (>60% of coverage)",
+      "Integration tests (>25% of coverage)",
+      "E2E tests (>15% of coverage)"
+    ]
+  },
+  "codeMetrics": {
+    "lines": "Per file max 300 lines",
+    "methods": "Per method max 50 lines",
+    "complexity": "Per method max cyclomatic complexity 15",
+    "nesting": "Max nesting depth 3",
+    "parameters": "Max method parameters 4"
+  }
+}

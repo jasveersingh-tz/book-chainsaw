@@ -1,32 +1,105 @@
-# BookChainsaw
+# BookChainsaw - Library Management System
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
+Advanced library management system with AI-powered pull request reviews and GitHub Actions CI/CD.
 
-## Development server
+## Features
 
-To start a local development server, run:
+### 📚 Core Features
+
+- Book inventory management with search and filtering
+- User management with membership tracking
+- Employee management with role-based access
+- Book issue/return system with fine calculation
+- Dashboard with real-time metrics
+- Point of Sale (POS) system for book transactions
+
+### 🤖 AI-Powered Code Review
+
+- Strict code quality checks (TypeScript, ESLint, Tests)
+- Logical validation and analysis
+- Security vulnerability detection
+- Automated PR scoring (0-100)
+- GitHub Actions integration
+- Real-time feedback on pull requests
+
+### 🔐 Technology Stack
+
+- **Frontend**: Angular 21 (Standalone Components)
+- **Language**: TypeScript 5.9 (Strict Mode)
+- **Styling**: Tailwind CSS 4.1
+- **State Management**: RxJS 7.8 with BehaviorSubjects
+- **Testing**: Jasmine/Karma
+- **Linting**: ESLint 9 with TypeScript plugin
+- **Build**: esbuild (Angular CLI)
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
 
 ```bash
-ng serve
+# Clone repository
+git clone https://github.com/jasveersingh-tz/book-chainsaw.git
+cd book-chainsaw
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Visit `http://localhost:4200`
 
-## Code scaffolding
+### Demo Credentials
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+**Admin Account**
 
-```bash
-ng generate component component-name
-```
+- Email: `admin@library.com`
+- Password: `admin123`
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+**Librarian Account**
 
-```bash
-ng generate --help
-```
+- Email: `librarian@library.com`
+- Password: `librarian123`
 
-## Building
+**Staff Account**
+
+- Email: `staff@library.com`
+- Password: `staff123`
+
+## GitHub Actions CI/CD
+
+This project includes automated GitHub Actions workflows:
+
+### Available Workflows
+
+1. **AI Code Review** - Automated code quality and security analysis
+2. **Build & Test** - Continuous integration with multi-version testing
+3. **Code Quality** - TypeScript and ESLint validation
+
+### Setup Instructions
+
+See [GITHUB_ACTIONS_SETUP.md](./GITHUB_ACTIONS_SETUP.md) for:
+
+- Workflow installation
+- Branch protection rules
+- Configuration options
+- Troubleshooting
+
+### Required Status Checks
+
+Before merging PRs, all must pass:
+
+- ✅ AI Code Review (Score ≥85)
+- ✅ Build & Test (Node 18.x, 20.x)
+- ✅ Code Quality (Lint, TypeScript strict)
+
+## Development
 
 To build the project run:
 

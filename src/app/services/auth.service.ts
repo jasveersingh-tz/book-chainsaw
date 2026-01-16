@@ -25,7 +25,7 @@ export class AuthService {
         );
         this.currentEmployee$ = this.currentEmployeeSubject.asObservable();
 
-        this.isAuthenticatedSubject = new BehaviorSubject<boolean>(!!storedEmployee);
+        this.isAuthenticatedSubject = new BehaviorSubject<boolean>(Boolean(storedEmployee));
         this.isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
     }
 

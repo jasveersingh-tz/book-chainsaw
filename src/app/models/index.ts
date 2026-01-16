@@ -51,20 +51,6 @@ export interface BookIssue {
     fineAmount?: number;
 }
 
-export interface PullRequest {
-    id: string;
-    title: string;
-    description: string;
-    branch: string;
-    author: string;
-    status: 'pending' | 'approved' | 'rejected';
-    lintScore: number;
-    testsPassed: boolean;
-    codeReviewComments: string[];
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 export interface Dashboard {
     totalBooks: number;
     totalUsers: number;
