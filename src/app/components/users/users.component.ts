@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { User } from '../../models/index';
 import { UserService } from '../../services/user.service';
 
@@ -10,10 +11,11 @@ import { UserService } from '../../services/user.service';
     imports: [CommonModule, FormsModule],
     templateUrl: './users.component.html',
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit, OnDestroy {
     public users: User[] = [];
     public searchTerm: string = '';
     public showAddForm: boolean = false;
+    private subscription: Subscription = new Subscription();
 
     public newUser: Omit<User, 'id'> = {
         username: '',
@@ -29,9 +31,14 @@ export class UsersComponent implements OnInit {
     constructor(private userService: UserService) { }
 
     public ngOnInit(): void {
-        this.userService.getUsers().subscribe((users) => {
+        const sub = this.userService.getUsers().subscribe((users) => {
             this.users = users;
         });
+        this.subscription.add(sub);
+    }
+
+    public ngOnDestroy(): void {
+        this.subscription.unsubscribe();
     }
 
     public getFilteredUsers(): User[] {
@@ -81,5 +88,9 @@ export class UsersComponent implements OnInit {
 
     public toggleAddForm(): void {
         this.showAddForm = !this.showAddForm;
+    }
+
+    public trackByUserId(index: number, user: User): string {
+        return user.id;
     }
 }

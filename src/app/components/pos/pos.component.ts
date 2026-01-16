@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { BookIssue, Book, User } from '../../models/index';
 import { BookIssueService } from '../../services/book-issue.service';
 import { InventoryService } from '../../services/inventory.service';
@@ -13,11 +14,12 @@ import { AuthService } from '../../services/auth.service';
     imports: [CommonModule, FormsModule],
     templateUrl: './pos.component.html',
 })
-export class PosComponent implements OnInit {
+export class PosComponent implements OnInit, OnDestroy {
     public books: Book[] = [];
     public users: User[] = [];
     public bookIssues: BookIssue[] = [];
     public overdueBooks: BookIssue[] = [];
+    private subscription: Subscription = new Subscription();
 
     public selectedBookId: string = '';
     public selectedUserId: string = '';
@@ -33,18 +35,25 @@ export class PosComponent implements OnInit {
     ) { }
 
     public ngOnInit(): void {
-        this.inventoryService.getBooks().subscribe((books) => {
+        const booksSub = this.inventoryService.getBooks().subscribe((books) => {
             this.books = books;
         });
+        this.subscription.add(booksSub);
 
-        this.userService.getUsers().subscribe((users) => {
+        const usersSub = this.userService.getUsers().subscribe((users) => {
             this.users = users;
         });
+        this.subscription.add(usersSub);
 
-        this.bookIssueService.getBookIssues().subscribe((issues) => {
+        const issuesSub = this.bookIssueService.getBookIssues().subscribe((issues) => {
             this.bookIssues = issues;
             this.overdueBooks = this.bookIssueService.getOverdueBooks();
         });
+        this.subscription.add(issuesSub);
+    }
+
+    public ngOnDestroy(): void {
+        this.subscription.unsubscribe();
     }
 
     public getAvailableBooks(): Book[] {
@@ -90,5 +99,17 @@ export class PosComponent implements OnInit {
 
     public getUserName(userId: string): string {
         return this.users.find((user) => user.id === userId)?.username || 'Unknown User';
+    }
+
+    public trackByUserId(index: number, user: User): string {
+        return user.id;
+    }
+
+    public trackByBookId(index: number, book: Book): string {
+        return book.id;
+    }
+
+    public trackByIssueId(index: number, issue: BookIssue): string {
+        return issue.id;
     }
 }
