@@ -57,7 +57,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let issue of getIssuedBooks(); trackBy: trackByIssueId" class="border-t hover:bg-gray-50">
+                            <tr *ngFor="let issue of getIssuedBooks(); trackBy: trackByIssueId"
+                                class="border-t hover:bg-gray-50">
                                 <td class="px-4 py-2">{{ getBookTitle(issue.bookId) }}</td>
                                 <td class="px-4 py-2">{{ getUserName(issue.userId) }}</td>
                                 <td class="px-4 py-2 text-center">{{ issue.issueDate | date: 'short' }}</td>
