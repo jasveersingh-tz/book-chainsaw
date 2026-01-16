@@ -29,6 +29,10 @@ jobs:
         run: npm install
         continue-on-error: true
 
+      - name: Rebuild native modules
+        run: npm rebuild
+        continue-on-error: true
+
       - name: Run TypeScript strict check
         id: typescript
         run: |
