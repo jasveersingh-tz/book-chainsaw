@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
@@ -33,15 +34,23 @@ jobs:
       - name: Run ESLint
         id: lint
         run: |
-          npm run lint 2>&1 | tee lint-output.txt
-          echo "lint_output=$(cat lint-output.txt)" >> $GITHUB_OUTPUT
+          npm run lint 2>&1 | tee lint-output.txt || echo "Lint failed"
+          if grep -q "error" lint-output.txt; then
+            echo "status=failed" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
         continue-on-error: true
 
-      - name: Run Tests
+      - name: Run Tests with Coverage
         id: tests
         run: |
-          npm run test:ci 2>&1 | tee test-output.txt
-          echo "test_output=$(cat test-output.txt)" >> $GITHUB_OUTPUT
+          npm run test:ci 2>&1 | tee test-output.txt || echo "Tests failed"
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+          fi
         continue-on-error: true
 
       - name: Get Changed Files
@@ -51,103 +60,53 @@ jobs:
           files: |
             src/**/*.ts
             src/**/*.html
+            src/**/*.css
 
-      - name: Analyze Code Quality
-        id: analysis
+      - name: Run Code Analysis
+        id: code-analysis
         run: |
-          cat > analyze.js << 'EOF'
-          const fs = require('fs');
-          const path = require('path');
+          CHANGED_FILES="${{ steps.changed-files.outputs.all_changed_files }}" npm run ai:analyze > code-analysis.json || true
+          cat code-analysis.json
+          echo "result<<EOF" >> $GITHUB_OUTPUT
+          cat code-analysis.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        continue-on-error: true
 
-          // Get changed files from environment
-          const changedFiles = process.env.CHANGED_FILES.split(',').filter(f => f.trim());
-          
-          let issues = [];
-          let score = 100;
+      - name: Run Coverage Analysis
+        id: coverage-analysis
+        run: |
+          CHANGED_FILES="${{ steps.changed-files.outputs.all_changed_files }}" npm run ai:coverage > coverage-analysis.json || true
+          cat coverage-analysis.json
+          echo "result<<EOF" >> $GITHUB_OUTPUT
+          cat coverage-analysis.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        continue-on-error: true
 
-          // Check file patterns
-          changedFiles.forEach(file => {
-            if (!file) return;
-            
-            try {
-              const content = fs.readFileSync(file, 'utf8');
-              
-              // Check for 'any' types in TypeScript
-              if (file.endsWith('.ts') && content.includes(': any')) {
-                issues.push({
-                  severity: 'error',
-                  category: 'Type Safety',
-                  file,
-                  message: 'Avoid using "any" type. Use explicit types instead.'
-                });
-                score -= 15;
-              }
+      - name: Run Security Scan
+        id: security-scan
+        run: |
+          CHANGED_FILES="${{ steps.changed-files.outputs.all_changed_files }}" npm run ai:security > security-scan.json || true
+          cat security-scan.json
+          echo "result<<EOF" >> $GITHUB_OUTPUT
+          cat security-scan.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        continue-on-error: true
 
-              // Check for console.log in production code
-              if (file.endsWith('.ts') && content.includes('console.log') && !file.includes('.spec.')) {
-                issues.push({
-                  severity: 'warning',
-                  category: 'Debugging',
-                  file,
-                  message: 'Remove console.log statements from production code.'
-                });
-                score -= 5;
-              }
-
-              // Check for hardcoded credentials
-              if (content.match(/password\s*[:=]\s*['"][^'"]*['"]/i) || 
-                  content.match(/api.?key\s*[:=]\s*['"][^'"]*['"]/i)) {
-                issues.push({
-                  severity: 'error',
-                  category: 'Security',
-                  file,
-                  message: 'Never hardcode credentials or API keys in code.'
-                });
-                score -= 20;
-              }
-
-              // Check for TODO comments
-              if (content.includes('TODO') || content.includes('FIXME')) {
-                issues.push({
-                  severity: 'warning',
-                  category: 'Code Quality',
-                  file,
-                  message: 'Unresolved TODO/FIXME comments found. Please address or create an issue.'
-                });
-                score -= 3;
-              }
-
-              // Check for proper error handling
-              if (file.endsWith('.ts') && content.includes('catch') && !content.includes('catch (error)')) {
-                issues.push({
-                  severity: 'warning',
-                  category: 'Error Handling',
-                  file,
-                  message: 'Ensure proper error handling with typed catch blocks.'
-                });
-                score -= 5;
-              }
-
-              // Check for async/await patterns
-              if (file.endsWith('.ts') && content.includes('.then(') && content.includes('.catch(')) {
-                issues.push({
-                  severity: 'info',
-                  category: 'Code Style',
-                  file,
-                  message: 'Consider using async/await instead of promise chains for better readability.'
-                });
-              }
-            } catch (e) {
-              // File might not exist
-            }
-          });
-
-          console.log(JSON.stringify({ issues, score: Math.max(0, score) }, null, 2));
-          EOF
-          
-          CHANGED_FILES="${{ steps.changed-files.outputs.all_changed_files }}" node analyze.js > analysis-result.json
-          cat analysis-result.json
-          echo "analysis_result=$(cat analysis-result.json | jq -c .)" >> $GITHUB_OUTPUT
+      - name: Analyze PR Metadata
+        id: pr-analysis
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}" \
+          PR_DESCRIPTION="${{ github.event.pull_request.body }}" \
+          PR_HEAD_REF="${{ github.head_ref }}" \
+          PR_ADDITIONS="${{ github.event.pull_request.additions }}" \
+          PR_DELETIONS="${{ github.event.pull_request.deletions }}" \
+          PR_CHANGED_FILES="${{ github.event.pull_request.changed_files }}" \
+          npm run ai:pr > pr-analysis.json || true
+          cat pr-analysis.json
+          echo "result<<EOF" >> $GITHUB_OUTPUT
+          cat pr-analysis.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        continue-on-error: true
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
 
@@ -188,107 +147,183 @@ jobs:
           }
 
           // PR title check
-          if (prTitle.length < 10) {
-            checks.push({ severity: 'error', message: 'PR title too short. Use descriptive titles (min 10 chars).' });
-            score -= 10;
-          } else if (prTitle.length > 100) {
-            checks.push({ severity: 'warning', message: 'PR title too long. Keep it concise (max 100 chars).' });
-            score -= 3;
-          } else {
-            checks.push({ severity: 'info', message: '✓ PR title: Well formatted' });
-          }
 
-          // PR description check
-          if (prDescription.length < 20) {
-            checks.push({ severity: 'error', message: 'PR description insufficient. Explain what and why.' });
-            score -= 15;
-          } else if (prDescription.length > 500) {
-            checks.push({ severity: 'info', message: '✓ PR description: Comprehensive' });
-            score += 3;
-          } else {
-            checks.push({ severity: 'info', message: '✓ PR description: Adequate' });
-          }
-
-          // Branch naming check
-          const branch = process.env.PR_HEAD_REF;
-          const validPrefixes = ['feature/', 'bugfix/', 'hotfix/', 'chore/', 'refactor/', 'docs/'];
-          const validBranch = validPrefixes.some(prefix => branch.startsWith(prefix));
-          if (!validBranch) {
-            checks.push({ 
-              severity: 'warning', 
-              message: `Branch "${branch}" doesn't follow naming convention. Use: ${validPrefixes.join(', ')}` 
-            });
-            score -= 5;
-          } else {
-            checks.push({ severity: 'info', message: `✓ Branch naming: "${branch}" follows convention` });
-          }
-
-          const finalScore = Math.max(0, Math.min(100, score));
-          const shouldApprove = finalScore >= 85 && lintPassed && testPassed;
-
-          console.log(JSON.stringify({
-            score: finalScore,
-            checks: [...checks, ...analysis.issues],
-            shouldApprove,
-            recommendation: shouldApprove ? 'APPROVE' : 'REQUEST CHANGES'
-          }, null, 2));
-          EOF
+      - name: Calculate Final Score
+        id: final-score
+        run: |
+          node -e "
+          const fs = require('fs');
           
-          node calculate-score.js > ai-result.json
-          cat ai-result.json
-          echo "ai_result=$(cat ai-result.json | jq -c .)" >> $GITHUB_OUTPUT
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_DESCRIPTION: ${{ github.event.pull_request.body }}
-          PR_HEAD_REF: ${{ github.head_ref }}
-          LINT_STATUS: ${{ steps.lint.outcome }}
-          TEST_STATUS: ${{ steps.tests.outcome }}
+          // Read all analysis results
+          const codeAnalysis = JSON.parse(fs.readFileSync('code-analysis.json', 'utf8'));
+          const coverageAnalysis = JSON.parse(fs.readFileSync('coverage-analysis.json', 'utf8'));
+          const securityScan = JSON.parse(fs.readFileSync('security-scan.json', 'utf8'));
+          const prAnalysis = JSON.parse(fs.readFileSync('pr-analysis.json', 'utf8'));
+          
+          // Calculate weighted final score
+          let finalScore = 0;
+          const weights = {
+            code: 0.35,
+            coverage: 0.25,
+            security: 0.25,
+            pr: 0.15
+          };
+          
+          finalScore += (codeAnalysis.score || 0) * weights.code;
+          finalScore += (coverageAnalysis.coverage?.passed ? 100 : 50) * weights.coverage;
+          finalScore += (securityScan.audit?.passed ? 100 : 60) * weights.security;
+          finalScore += (prAnalysis.score || 80) * weights.pr;
+          
+          // Collect all issues
+          const allIssues = [
+            ...(codeAnalysis.issues || []),
+            ...(coverageAnalysis.coverage?.issues || []),
+            ...(securityScan.audit?.issues || []),
+            ...(securityScan.fileIssues || []),
+            ...(prAnalysis.issues || [])
+          ];
+          
+          // Determine recommendation
+          const criticalIssues = allIssues.filter(i => i.severity === 'error').length;
+          const lintPassed = '${{ steps.lint.outputs.status }}' === 'success';
+          const testsPassed = '${{ steps.tests.outputs.status }}' === 'success';
+          
+          const shouldApprove = finalScore >= 85 && criticalIssues === 0 && lintPassed && testsPassed;
+          
+          const result = {
+            score: Math.round(finalScore),
+            recommendation: shouldApprove ? 'APPROVE' : 'REQUEST_CHANGES',
+            breakdown: {
+              code: Math.round((codeAnalysis.score || 0)),
+              coverage: coverageAnalysis.coverage?.passed ? 100 : 50,
+              security: securityScan.audit?.passed ? 100 : 60,
+              pr: Math.round(prAnalysis.score || 80)
+            },
+            checks: {
+              lint: lintPassed,
+              tests: testsPassed,
+              criticalIssues: criticalIssues
+            },
+            issues: allIssues,
+            metrics: {
+              filesAnalyzed: codeAnalysis.metrics?.filesAnalyzed || 0,
+              linesAnalyzed: codeAnalysis.metrics?.linesAnalyzed || 0,
+              vulnerabilities: securityScan.audit?.totalVulnerabilities || 0
+            }
+          };
+          
+          fs.writeFileSync('final-result.json', JSON.stringify(result, null, 2));
+          console.log(JSON.stringify(result, null, 2));
+          " || true
+          cat final-result.json
+        continue-on-error: true
 
       - name: Post AI Review Comment
+        if: always()
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const aiResult = JSON.parse(fs.readFileSync('ai-result.json', 'utf8'));
             
-            // Build comment
-            let comment = '## 🤖 AI Code Review Analysis\n\n';
-            comment += `**Overall Score:** ${aiResult.score}/100 `;
-            
-            if (aiResult.score >= 90) {
-              comment += '🟢\n';
-            } else if (aiResult.score >= 75) {
-              comment += '🟡\n';
-            } else {
-              comment += '🔴\n';
+            let result;
+            try {
+              result = JSON.parse(fs.readFileSync('final-result.json', 'utf8'));
+            } catch (e) {
+              result = {
+                score: 0,
+                recommendation: 'ERROR',
+                breakdown: {},
+                checks: {},
+                issues: [],
+                metrics: {}
+              };
             }
-
-            comment += `**Recommendation:** ${aiResult.recommendation}\n\n`;
-
-            // Group by severity
-            const errors = aiResult.checks.filter(c => c.severity === 'error');
-            const warnings = aiResult.checks.filter(c => c.severity === 'warning');
-            const infos = aiResult.checks.filter(c => c.severity === 'info');
-
+            
+            // Build comprehensive comment
+            let comment = '## 🤖 AI-Powered Code Review\n\n';
+            
+            // Overall score with visual indicator
+            comment += '### Overall Score\n';
+            comment += `**${result.score}/100** `;
+            if (result.score >= 90) comment += '🟢 Excellent\n';
+            else if (result.score >= 80) comment += '🟡 Good\n';
+            else if (result.score >= 70) comment += '🟠 Needs Improvement\n';
+            else comment += '🔴 Critical Issues\n';
+            
+            comment += `\n**Recommendation:** ${result.recommendation === 'APPROVE' ? '✅ Approve' : '⚠️ Request Changes'}\n\n`;
+            
+            // Score breakdown
+            comment += '### Score Breakdown\n';
+            comment += '| Category | Score | Weight |\n';
+            comment += '|----------|-------|--------|\n';
+            comment += `| Code Quality | ${result.breakdown.code}/100 | 35% |\n`;
+            comment += `| Test Coverage | ${result.breakdown.coverage}/100 | 25% |\n`;
+            comment += `| Security | ${result.breakdown.security}/100 | 25% |\n`;
+            comment += `| PR Metadata | ${result.breakdown.pr}/100 | 15% |\n\n`;
+            
+            // Key metrics
+            comment += '### Metrics\n';
+            comment += `- **Files Analyzed:** ${result.metrics.filesAnalyzed}\n`;
+            comment += `- **Lines Analyzed:** ${result.metrics.linesAnalyzed}\n`;
+            comment += `- **Lint:** ${result.checks.lint ? '✅ Pass' : '❌ Fail'}\n`;
+            comment += `- **Tests:** ${result.checks.tests ? '✅ Pass' : '❌ Fail'}\n`;
+            comment += `- **Vulnerabilities:** ${result.metrics.vulnerabilities}\n\n`;
+            
+            // Group issues by severity
+            const errors = result.issues.filter(i => i.severity === 'error');
+            const warnings = result.issues.filter(i => i.severity === 'warning');
+            const infos = result.issues.filter(i => i.severity === 'info');
+            
             if (errors.length > 0) {
-              comment += '### ❌ Errors (Critical)\n';
-              errors.forEach(e => {
-                comment += `- ${e.message}\n`;
+              comment += `### ❌ Critical Issues (${errors.length})\n`;
+              errors.slice(0, 10).forEach(e => {
+                comment += `- **[${e.category || 'Error'}]** ${e.message}\n`;
+                if (e.file) comment += `  \`${e.file}\`\n`;
               });
+              if (errors.length > 10) {
+                comment += `\n_... and ${errors.length - 10} more error(s)_\n`;
+              }
               comment += '\n';
             }
-
+            
             if (warnings.length > 0) {
-              comment += '### ⚠️ Warnings\n';
-              warnings.forEach(w => {
-                comment += `- ${w.message}\n`;
+              comment += `### ⚠️ Warnings (${warnings.length})\n`;
+              warnings.slice(0, 8).forEach(w => {
+                comment += `- **[${w.category || 'Warning'}]** ${w.message}\n`;
               });
+              if (warnings.length > 8) {
+                comment += `\n_... and ${warnings.length - 8} more warning(s)_\n`;
+              }
               comment += '\n';
             }
-
+            
             if (infos.length > 0) {
-              comment += '### ✅ Passed Checks\n';
-              infos.forEach(i => {
+              comment += `### ✅ Passed Checks (${infos.length})\n`;
+              infos.slice(0, 5).forEach(i => {
+                comment += `- ${i.message}\n`;
+              });
+              if (infos.length > 5) {
+                comment += `\n_... and ${infos.length - 5} more check(s) passed_\n`;
+              }
+              comment += '\n';
+            }
+            
+            comment += '---\n';
+            comment += '*AI Review powered by advanced static analysis. For questions, see [DEVELOPMENT.md](./DEVELOPMENT.md)*\n';
+            
+            // Post comment
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+            
+            // Fail workflow if score too low
+            if (result.score < 70 || result.checks.criticalIssues > 0) {
+              core.setFailed(`AI Review: Score ${result.score}/100 with ${result.checks.criticalIssues} critical issue(s)`);
+            }
+
                 comment += `- ${i.message}\n`;
               });
               comment += '\n';

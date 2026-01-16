@@ -1,53 +1,27 @@
 # BookChainsaw - Library Management System
 
-Advanced library management system with AI-powered pull request reviews and GitHub Actions CI/CD.
+Modern library management system with automated code quality checks and GitHub Actions CI/CD.
 
 ## Features
 
-### 📚 Core Features
+- 📚 Book inventory, user management, employee management
+- 💰 Book issue/return with fine calculation
+- 📊 Dashboard with real-time metrics
+- 🤖 AI-powered PR reviews with automated scoring
+- ✅ GitHub Actions workflows (build, test, quality, SonarQube)
 
-- Book inventory management with search and filtering
-- User management with membership tracking
-- Employee management with role-based access
-- Book issue/return system with fine calculation
-- Dashboard with real-time metrics
-- Point of Sale (POS) system for book transactions
+## Tech Stack
 
-### 🤖 AI-Powered Code Review
-
-- Strict code quality checks (TypeScript, ESLint, Tests)
-- Logical validation and analysis
-- Security vulnerability detection
-- Automated PR scoring (0-100)
-- GitHub Actions integration
-- Real-time feedback on pull requests
-
-### 🔐 Technology Stack
-
-- **Frontend**: Angular 21 (Standalone Components)
-- **Language**: TypeScript 5.9 (Strict Mode)
-- **Styling**: Tailwind CSS 4.1
-- **State Management**: RxJS 7.8 with BehaviorSubjects
-- **Testing**: Jasmine/Karma
-- **Linting**: ESLint 9 with TypeScript plugin
-- **Build**: esbuild (Angular CLI)
+- Angular 21, TypeScript 5.5, Bootstrap 5.3
+- RxJS, ESLint 9, Vitest
 
 ## Quick Start
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
 ```bash
-# Clone repository
 git clone https://github.com/jasveersingh-tz/book-chainsaw.git
 cd book-chainsaw
-
-# Install dependencies
 npm install
+npm start  # Opens at http://localhost:4200
 
 # Start development server
 npm start
@@ -72,61 +46,32 @@ Visit `http://localhost:4200`
 - Email: `staff@library.com`
 - Password: `staff123`
 
-## GitHub Actions CI/CD
+## GitHub Actions CI/CD```
 
-This project includes automated GitHub Actions workflows:
+## Demo Login
 
-### Available Workflows
-
-1. **AI Code Review** - Automated code quality and security analysis
-2. **Build & Test** - Continuous integration with multi-version testing
-3. **Code Quality** - TypeScript and ESLint validation
-
-### Setup Instructions
-
-See [GITHUB_ACTIONS_SETUP.md](./GITHUB_ACTIONS_SETUP.md) for:
-
-- Workflow installation
-- Branch protection rules
-- Configuration options
-- Troubleshooting
-
-### Required Status Checks
-
-Before merging PRs, all must pass:
-
-- ✅ AI Code Review (Score ≥85)
-- ✅ Build & Test (Node 18.x, 20.x)
-- ✅ Code Quality (Lint, TypeScript strict)
+| Role      | Email                 | Password     |
+| --------- | --------------------- | ------------ |
+| Admin     | admin@library.com     | admin123     |
+| Librarian | librarian@library.com | librarian123 |
+| Staff     | staff@library.com     | staff123     |
 
 ## Development
 
-To build the project run:
-
 ```bash
-ng build
+npm start           # Dev server at http://localhost:4200
+npm run build       # Production build
+npm run lint        # Run ESLint
+npm test            # Run unit tests with Vitest
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## GitHub Actions
 
-## Running unit tests
+4 automated workflows run on every PR:
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+1. **build-test.yml** - Build, lint, test (required to merge)
+2. **code-quality.yml** - TypeScript strict + security checks
+3. **ai-code-review.yml** - AI-powered PR review with scoring
+4. **sonarqube-analysis.yml** - Code quality metrics tracking
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+See `DEVELOPMENT.md` for detailed setup and contribution guidelines.

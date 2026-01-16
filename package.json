@@ -15,7 +15,11 @@
     "sonar:check": "node scripts/sonar-check.js",
     "quality:gate": "node scripts/quality-gate.js",
     "security:scan": "node scripts/security-scan.js",
-    "metrics:report": "node scripts/metrics-report.js"
+    "metrics:report": "node scripts/metrics-report.js",
+    "ai:analyze": "node scripts/ai-review/code-analyzer.js",
+    "ai:coverage": "node scripts/ai-review/coverage-analyzer.js",
+    "ai:security": "node scripts/ai-review/security-scanner.js",
+    "ai:pr": "node scripts/ai-review/pr-analyzer.js"
   },
   "prettier": {
     "printWidth": 100,
