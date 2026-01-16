@@ -110,44 +110,6 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
 
-      - name: Calculate AI Score
-        id: ai-score
-        run: |
-          cat > calculate-score.js << 'EOF'
-          const fs = require('fs');
-
-          // Read analysis results
-          const analysis = JSON.parse(fs.readFileSync('analysis-result.json', 'utf8'));
-          
-          // Read PR info
-          const prTitle = process.env.PR_TITLE;
-          const prDescription = process.env.PR_DESCRIPTION;
-          
-          let score = analysis.score;
-          const checks = [];
-
-          // Lint score check
-          const lintPassed = process.env.LINT_STATUS === 'success';
-          if (lintPassed) {
-            checks.push({ severity: 'info', message: '✓ ESLint: All checks passed' });
-            score += 5;
-          } else {
-            checks.push({ severity: 'error', message: '✗ ESLint: Issues found' });
-            score -= 15;
-          }
-
-          // Test status check
-          const testPassed = process.env.TEST_STATUS === 'success';
-          if (testPassed) {
-            checks.push({ severity: 'info', message: '✓ Tests: All passing' });
-            score += 5;
-          } else {
-            checks.push({ severity: 'error', message: '✗ Tests: Some tests failing' });
-            score -= 20;
-          }
-
-          // PR title check
-
       - name: Calculate Final Score
         id: final-score
         run: |
@@ -322,25 +284,4 @@ jobs:
             // Fail workflow if score too low
             if (result.score < 70 || result.checks.criticalIssues > 0) {
               core.setFailed(`AI Review: Score ${result.score}/100 with ${result.checks.criticalIssues} critical issue(s)`);
-            }
-
-                comment += `- ${i.message}\n`;
-              });
-              comment += '\n';
-            }
-
-            comment += '---\n';
-            comment += '*This review was automated by AI Code Review Bot. For manual review, see your reviewers.*\n';
-
-            // Post comment
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-
-            // Set status
-            if (aiResult.score < 75) {
-              core.setFailed('AI Review: Code does not meet quality standards');
             }
