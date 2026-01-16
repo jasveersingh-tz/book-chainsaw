@@ -1,20 +1,13 @@
-# Development Guide - Library Management System
+# Development Guide
 
-## Quick Start
-
-### 1. First-Time Setup
+## Setup
 
 ```bash
-cd book-chainsaw
 npm install
-npm start
+npm start  # http://localhost:4200
 ```
 
-Application runs on `http://localhost:4200`
-
-### 2. Demo Access
-
-Use these credentials to test different roles:
+## Demo Credentials
 
 | Role      | Email                 | Password     |
 | --------- | --------------------- | ------------ |
@@ -22,82 +15,58 @@ Use these credentials to test different roles:
 | Librarian | librarian@library.com | librarian123 |
 | Staff     | staff@library.com     | staff123     |
 
-## Code Quality Standards
-
-### ESLint
-
-The project enforces strict code quality rules:
+## Code Quality
 
 ```bash
-# Check for violations
-npm run lint
-
-# Auto-fix violations
-npm run lint:fix
-
-# Generate report
-npm run lint:check
+npm run lint           # Check code quality
+npm run lint:fix       # Auto-fix issues
+npm test               # Run unit tests
+npm run build          # Production build
 ```
 
-### Key Rules Enforced
+### Enforced Rules
 
-- ✅ No `any` types
-- ✅ Explicit function return types
-- ✅ Explicit member accessibility (`public`, `private`, `protected`)
-- ✅ Const over let/var
-- ✅ Strict equality (`===`)
-- ✅ No unused variables
-- ✅ Type-safe boolean expressions
-- ✅ Proper null/undefined handling
+- No `any` types, explicit return types
+- Strict equality (`===`), no unused vars
+- Type-safe expressions, null/undefined handling
+- Public/private/protected accessibility modifiers
 
-## Project Architecture
+## Architecture
 
-### Services Layer
+**Services** - Business logic with RxJS observables
+**Components** - UI with Bootstrap, standalone components
+**Guards** - Route protection (`authGuard`)
+**Models** - TypeScript interfaces in `models/index.ts`
 
-Services handle business logic and data management:
+## Adding Features
 
-```typescript
-// Example: Injecting multiple services
-constructor(
-  private inventoryService: InventoryService,
-  private userService: UserService,
-  private authService: AuthService,
-) {}
+1. **Create model** in `src/app/models/index.ts`
+2. **Create service** with RxJS BehaviorSubject
+3. **Create component** with `ng generate component`
+4. **Add route** in `app.routes.ts`
+5. **Test** with `npm run lint` and `npm test`
+
+## Project Structure
+
+```
+src/app/
+├── components/
+│   ├── dashboard/      # Metrics
+│   ├── inventory/      # Book management
+│   ├── users/          # Member management
+│   ├── employees/      # Staff management
+│   ├── book-issue/     # Issue/return
+│   ├── pos/            # POS system
+│   └── auth/           # Login
+├── services/           # 7 services (auth, book, user, etc.)
+├── models/             # TypeScript interfaces
+├── guards/             # Route protection
+└── app.routes.ts       # Routing config
 ```
 
-### RxJS Patterns
+## GitHub Actions Workflows
 
-All data flows are reactive:
-
-```typescript
-// Observable subscription
-this.userService.getUsers().subscribe((users) => {
-  this.users = users;
-});
-```
-
-### Component Structure
-
-Each component includes:
-
-- Template with Tailwind styling
-- Form handling with FormsModule
-- Event binding and ngFor loops
-- Type-safe implementation
-
-## Adding a New Feature
-
-### 1. Create Model/Interface
-
-Add to `src/app/models/index.ts`:
-
-```typescript
-export interface NewFeature {
-  id: string;
-  name: string;
-  // ... other properties
-}
-```
+4 workflows run automatically on PR:
 
 ### 2. Create Service
 
@@ -409,31 +378,25 @@ npm install
 
 Run type check:
 
-```bash
-npx tsc --noEmit
-```
+1. **build-test.yml** - Build, lint, test (must pass to merge)
+2. **code-quality.yml** - TypeScript strict + security checks
+3. **ai-code-review.yml** - AI-powered PR scoring (0-100)
+4. **sonarqube-analysis.yml** - Quality metrics tracking
 
-### Build fails
+All workflows trigger on PR and run: `npm install → npm rebuild → npm run lint → npm run build`
 
-```bash
-# Clear Angular cache
-rm -rf .angular/
-npm run build
-```
+## Contributing
 
-## Resources
+1. Create feature branch: `git checkout -b feature/your-feature`
+2. Make changes with proper TypeScript types
+3. Run `npm run lint:fix` before commit
+4. Push and create PR - workflows run automatically
+5. Fix any workflow failures before merge
 
-- [Angular Documentation](https://angular.io)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [RxJS Documentation](https://rxjs.dev)
-- [Tailwind CSS](https://tailwindcss.com)
-- [ESLint Rules](https://eslint.org/docs/rules/)
+## Troubleshooting
 
-## Support
-
-For issues or questions:
-
-1. Check existing documentation
-2. Review error messages carefully
-3. Check browser console for errors
-4. Run `npm run lint:fix` for code issues
+**Port in use:** `ng serve --port 4201`  
+**Lint errors:** `npm run lint:fix`  
+**Type errors:** `npx tsc --noEmit`  
+**Build fails:** `rm -rf .angular/ && npm run build`  
+**Dependencies broken:** `rm -rf node_modules package-lock.json && npm install`
