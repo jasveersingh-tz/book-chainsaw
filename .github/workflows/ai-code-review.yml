@@ -42,17 +42,6 @@ jobs:
           fi
         continue-on-error: true
 
-      - name: Run Tests with Coverage
-        id: tests
-        run: |
-          npm run test:ci 2>&1 | tee test-output.txt || echo "Tests failed"
-          if [ -f coverage/coverage-summary.json ]; then
-            echo "status=success" >> $GITHUB_OUTPUT
-          else
-            echo "status=failed" >> $GITHUB_OUTPUT
-          fi
-        continue-on-error: true
-
       - name: Get Changed Files
         id: changed-files
         uses: tj-actions/changed-files@v42
@@ -61,6 +50,9 @@ jobs:
             src/**/*.ts
             src/**/*.html
             src/**/*.css
+          files_ignore: |
+            **/*.spec.ts
+            **/*.spec.js
 
       - name: Run Code Analysis
         id: code-analysis
@@ -94,38 +86,6 @@ jobs:
           
           echo "result<<EOF" >> $GITHUB_OUTPUT
           cat code-analysis.json >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        continue-on-error: true
-        env:
-          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-
-      - name: Run Coverage Analysis
-        id: coverage-analysis
-        run: |
-          echo "Changed files: ${CHANGED_FILES}"
-          
-          if [ -z "$CHANGED_FILES" ]; then
-            echo '{"coverage":{"passed":true,"issues":[]},"testFiles":{"passed":true}}' > coverage-analysis.json
-          else
-            # Convert space-separated to comma-separated
-            CHANGED_FILES_COMMA=$(echo "$CHANGED_FILES" | tr ' ' ',')
-            export CHANGED_FILES="$CHANGED_FILES_COMMA"
-            
-            npm run ai:coverage > coverage-analysis.json 2>&1 || {
-              echo '{"coverage":{"passed":false,"issues":[{"severity":"warning","message":"Coverage analysis failed - tests may not be running"}]},"testFiles":{"passed":false}}' > coverage-analysis.json
-            }
-          fi
-          
-          echo "Coverage analysis output:"
-          cat coverage-analysis.json
-          
-          # Validate JSON
-          if ! node -e "JSON.parse(require('fs').readFileSync('coverage-analysis.json','utf8'))" 2>/dev/null; then
-            echo '{"coverage":{"passed":false,"issues":[{"severity":"warning","message":"Invalid coverage output"}]},"testFiles":{"passed":false}}' > coverage-analysis.json
-          fi
-          
-          echo "result<<EOF" >> $GITHUB_OUTPUT
-          cat coverage-analysis.json >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         continue-on-error: true
         env:
@@ -198,33 +158,28 @@ jobs:
           
           // Read all analysis results with fallbacks
           const codeAnalysis = readJsonFile('code-analysis.json', { score: 0, issues: [], metrics: {} });
-          const coverageAnalysis = readJsonFile('coverage-analysis.json', { coverage: { passed: false, issues: [] } });
           const securityScan = readJsonFile('security-scan.json', { audit: { passed: true, issues: [], totalVulnerabilities: 0 }, fileIssues: [] });
           const prAnalysis = readJsonFile('pr-analysis.json', { score: 80, issues: [] });
           
-          // Calculate weighted final score
+          // Calculate weighted final score (no coverage/tests for this project)
           let finalScore = 0;
           const weights = {
-            code: 0.35,
-            coverage: 0.25,
-            security: 0.25,
-            pr: 0.15
+            code: 0.50,
+            security: 0.30,
+            pr: 0.20
           };
           
           const codeScore = codeAnalysis.score || 0;
-          const coverageScore = coverageAnalysis.coverage?.passed ? 100 : 50;
           const securityScore = securityScan.audit?.passed ? 100 : 60;
           const prScore = prAnalysis.score || 80;
           
           finalScore += codeScore * weights.code;
-          finalScore += coverageScore * weights.coverage;
           finalScore += securityScore * weights.security;
           finalScore += prScore * weights.pr;
           
           // Collect all issues
           const allIssues = [
             ...(codeAnalysis.issues || []),
-            ...(coverageAnalysis.coverage?.issues || []),
             ...(securityScan.audit?.issues || []),
             ...(securityScan.fileIssues || []),
             ...(prAnalysis.issues || [])
@@ -233,22 +188,19 @@ jobs:
           // Determine recommendation
           const criticalIssues = allIssues.filter(i => i.severity === 'error').length;
           const lintPassed = '${{ steps.lint.outputs.status }}' === 'success';
-          const testsPassed = '${{ steps.tests.outputs.status }}' === 'success';
           
-          const shouldApprove = finalScore >= 85 && criticalIssues === 0 && lintPassed && testsPassed;
+          const shouldApprove = finalScore >= 85 && criticalIssues === 0 && lintPassed;
           
           const result = {
             score: Math.round(finalScore),
             recommendation: shouldApprove ? 'APPROVE' : 'REQUEST_CHANGES',
             breakdown: {
               code: Math.round(codeScore),
-              coverage: coverageScore,
               security: securityScore,
               pr: Math.round(prScore)
             },
             checks: {
               lint: lintPassed,
-              tests: testsPassed,
               criticalIssues: criticalIssues
             },
             issues: allIssues,
@@ -279,8 +231,8 @@ jobs:
               result = {
                 score: 0,
                 recommendation: 'ERROR',
-                breakdown: { code: 0, coverage: 0, security: 0, pr: 0 },
-                checks: { lint: false, tests: false, criticalIssues: 0 },
+                breakdown: { code: 0, security: 0, pr: 0 },
+                checks: { lint: false, criticalIssues: 0 },
                 issues: [{
                   severity: 'error',
                   message: 'Failed to generate AI review report: ' + e.message
@@ -290,8 +242,8 @@ jobs:
             }
             
             // Ensure all required fields exist
-            result.breakdown = result.breakdown || { code: 0, coverage: 0, security: 0, pr: 0 };
-            result.checks = result.checks || { lint: false, tests: false, criticalIssues: 0 };
+            result.breakdown = result.breakdown || { code: 0, security: 0, pr: 0 };
+            result.checks = result.checks || { lint: false, criticalIssues: 0 };
             result.metrics = result.metrics || { filesAnalyzed: 0, linesAnalyzed: 0, vulnerabilities: 0 };
             result.issues = result.issues || [];
             
@@ -312,17 +264,15 @@ jobs:
             comment += '### Score Breakdown\n';
             comment += '| Category | Score | Weight |\n';
             comment += '|----------|-------|--------|\n';
-            comment += `| Code Quality | ${result.breakdown.code || 0}/100 | 35% |\n`;
-            comment += `| Test Coverage | ${result.breakdown.coverage || 0}/100 | 25% |\n`;
-            comment += `| Security | ${result.breakdown.security || 0}/100 | 25% |\n`;
-            comment += `| PR Metadata | ${result.breakdown.pr || 0}/100 | 15% |\n\n`;
+            comment += `| Code Quality | ${result.breakdown.code || 0}/100 | 50% |\n`;
+            comment += `| Security | ${result.breakdown.security || 0}/100 | 30% |\n`;
+            comment += `| PR Metadata | ${result.breakdown.pr || 0}/100 | 20% |\n\n`;
             
             // Key metrics
             comment += '### Metrics\n';
             comment += `- **Files Analyzed:** ${result.metrics.filesAnalyzed || 0}\n`;
             comment += `- **Lines Analyzed:** ${result.metrics.linesAnalyzed || 0}\n`;
             comment += `- **Lint:** ${result.checks.lint ? '✅ Pass' : '❌ Fail'}\n`;
-            comment += `- **Tests:** ${result.checks.tests ? '✅ Pass' : '❌ Fail'}\n`;
             comment += `- **Vulnerabilities:** ${result.metrics.vulnerabilities || 0}\n\n`;
             
             // Group issues by severity

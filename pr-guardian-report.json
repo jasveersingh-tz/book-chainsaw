@@ -1,0 +1,116 @@
+{
+  "decision": {
+    "timestamp": "2026-02-23T08:40:52.446Z",
+    "decision": "APPROVE",
+    "score": 100,
+    "reason": "All quality checks passed",
+    "issues": {
+      "criticalCount": 0,
+      "highCount": 0,
+      "mediumCount": 0,
+      "lowCount": 0,
+      "breakingCount": 0,
+      "details": {
+        "critical": [],
+        "high": [],
+        "medium": [],
+        "low": [],
+        "breaking": []
+      }
+    },
+    "recommendation": "✅ **APPROVED FOR MERGE**\n\nAll quality checks passed. Safe to merge.",
+    "details": {
+      "dependencyGraph": {
+        "totalFiles": 24,
+        "analyzedFiles": 0,
+        "criticalIssues": 0,
+        "highIssues": 0,
+        "breakingChanges": 0
+      },
+      "callGraph": {
+        "functionsAnalyzed": 107,
+        "totalCallSites": 101,
+        "incompatibleCalls": 0
+      },
+      "contracts": {
+        "totalViolations": 0,
+        "criticalViolations": 0,
+        "highViolations": 0,
+        "interfacesTracked": 6,
+        "implementationsTracked": 7
+      },
+      "performance": {
+        "totalIssues": 0,
+        "errors": 0,
+        "warnings": 0,
+        "bundleImpact": {
+          "estimatedSizeDelta": "0 KB",
+          "largeFiles": []
+        }
+      },
+      "stateMutations": {
+        "totalMutations": 0,
+        "sharedStateVariables": 0,
+        "highRiskMutations": 0
+      }
+    },
+    "thresholds": {
+      "criticalIssuesMax": 0,
+      "highIssuesMax": 5,
+      "breakingChangesMax": 0,
+      "minScore": 70
+    }
+  },
+  "results": {
+    "dependencyGraph": {
+      "summary": {
+        "totalFiles": 24,
+        "analyzedFiles": 0,
+        "criticalIssues": 0,
+        "highIssues": 0,
+        "breakingChanges": 0
+      },
+      "impacts": [],
+      "circularDependencies": []
+    },
+    "callGraph": {
+      "summary": {
+        "functionsAnalyzed": 107,
+        "totalCallSites": 101,
+        "incompatibleCalls": 0
+      },
+      "analyses": []
+    },
+    "contracts": {
+      "summary": {
+        "totalViolations": 0,
+        "criticalViolations": 0,
+        "highViolations": 0,
+        "interfacesTracked": 6,
+        "implementationsTracked": 7
+      },
+      "violations": []
+    },
+    "stateMutations": {
+      "summary": {
+        "totalMutations": 0,
+        "sharedStateVariables": 0,
+        "highRiskMutations": 0
+      },
+      "mutations": [],
+      "sharedState": []
+    },
+    "performance": {
+      "summary": {
+        "totalIssues": 0,
+        "errors": 0,
+        "warnings": 0,
+        "bundleImpact": {
+          "estimatedSizeDelta": "0 KB",
+          "largeFiles": []
+        }
+      },
+      "antiPatterns": []
+    }
+  }
+}
