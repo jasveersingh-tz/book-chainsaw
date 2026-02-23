@@ -55,8 +55,32 @@ class MergeDecisionEngine {
       }
     }
 
-    // Call graph issues
+    // Call graph issues - signature changes
     if (results.callGraph) {
+      // Handle signature changes
+      for (const change of results.callGraph.signatureChanges || []) {
+        if (change.breaking && change.incompatibleCalls > 0) {
+          issues.critical.push({
+            type: 'SIGNATURE_CHANGE',
+            function: change.functionName,
+            file: change.file,
+            oldSignature: change.oldSignature,
+            newSignature: change.newSignature,
+            incompatibleCalls: change.incompatibleCalls,
+            details: change.incompatibilities,
+          });
+          issues.breaking.push(change);
+        } else if (change.incompatibleCalls > 0) {
+          issues.high.push({
+            type: 'SIGNATURE_CHANGE',
+            function: change.functionName,
+            file: change.file,
+            incompatibleCalls: change.incompatibleCalls,
+          });
+        }
+      }
+
+      // Legacy call graph analyses
       for (const analysis of results.callGraph.analyses || []) {
         if (analysis.risk === 'CRITICAL') {
           issues.critical.push(...analysis.incompatibilities);

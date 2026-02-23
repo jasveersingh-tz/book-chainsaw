@@ -1,28 +1,69 @@
 {
   "decision": {
-    "timestamp": "2026-02-23T08:40:52.446Z",
-    "decision": "APPROVE",
-    "score": 100,
-    "reason": "All quality checks passed",
+    "timestamp": "2026-02-23T10:12:33.996Z",
+    "decision": "BLOCK_MERGE",
+    "score": 90,
+    "reason": "1 critical issues detected (max: 0)",
     "issues": {
-      "criticalCount": 0,
+      "criticalCount": 1,
       "highCount": 0,
       "mediumCount": 0,
       "lowCount": 0,
-      "breakingCount": 0,
+      "breakingCount": 1,
       "details": {
-        "critical": [],
+        "critical": [
+          {
+            "type": "SIGNATURE_CHANGE",
+            "function": "login",
+            "file": "src/app/services/auth.service.ts",
+            "oldSignature": "login(email: string, password: string)",
+            "newSignature": "login(credentials: unknown)",
+            "incompatibleCalls": 1,
+            "details": [
+              {
+                "file": "src\\app\\components\\auth\\login.component.ts",
+                "line": 31,
+                "reason": "Too many arguments (expected max 1, got 2)",
+                "currentCall": "function call at line 31",
+                "suggestion": "Update call to: login(credentials)",
+                "severity": "CRITICAL"
+              }
+            ]
+          }
+        ],
         "high": [],
         "medium": [],
         "low": [],
-        "breaking": []
+        "breaking": [
+          {
+            "file": "src/app/services/auth.service.ts",
+            "functionName": "login",
+            "oldSignature": "login(email: string, password: string)",
+            "newSignature": "login(credentials: unknown)",
+            "breaking": true,
+            "callSites": 1,
+            "incompatibleCalls": 1,
+            "incompatibilities": [
+              {
+                "file": "src\\app\\components\\auth\\login.component.ts",
+                "line": 31,
+                "reason": "Too many arguments (expected max 1, got 2)",
+                "currentCall": "function call at line 31",
+                "suggestion": "Update call to: login(credentials)",
+                "severity": "CRITICAL"
+              }
+            ],
+            "severity": "CRITICAL"
+          }
+        ]
       }
     },
-    "recommendation": "✅ **APPROVED FOR MERGE**\n\nAll quality checks passed. Safe to merge.",
+    "recommendation": "⛔ **DO NOT MERGE**\n\n**Required Actions:**\n- Fix all critical issues before merge\n\n**Breaking Changes Detected:**\n- Create backward-compatible version of changed APIs\n- Add deprecation warnings to old APIs\n- Update documentation with migration guide\n\n**Critical Issues:**\n- Address all critical issues immediately\n- Run tests to verify fixes",
     "details": {
       "dependencyGraph": {
         "totalFiles": 24,
-        "analyzedFiles": 0,
+        "analyzedFiles": 2,
+        "totalImpacts": 0,
         "criticalIssues": 0,
         "highIssues": 0,
         "breakingChanges": 0
@@ -30,7 +71,8 @@
       "callGraph": {
         "functionsAnalyzed": 107,
         "totalCallSites": 101,
-        "incompatibleCalls": 0
+        "signatureChanges": 2,
+        "incompatibleCalls": 1
       },
       "contracts": {
         "totalViolations": 0,
@@ -44,8 +86,10 @@
         "errors": 0,
         "warnings": 0,
         "bundleImpact": {
-          "estimatedSizeDelta": "0 KB",
-          "largeFiles": []
+          "estimatedSizeDelta": "0.00 KB",
+          "largeFiles": [],
+          "threshold": "100 KB",
+          "exceeds": false
         }
       },
       "stateMutations": {
@@ -65,21 +109,468 @@
     "dependencyGraph": {
       "summary": {
         "totalFiles": 24,
-        "analyzedFiles": 0,
+        "analyzedFiles": 2,
+        "totalImpacts": 0,
         "criticalIssues": 0,
         "highIssues": 0,
         "breakingChanges": 0
       },
-      "impacts": [],
-      "circularDependencies": []
+      "impacts": [
+        {
+          "changedFile": "src/app/services/auth.service.ts",
+          "apiChanges": [
+            {
+              "type": "MODIFIED",
+              "category": "classes",
+              "name": "AuthService",
+              "severity": "LOW",
+              "breaking": false,
+              "oldSignature": {
+                "type": "classes",
+                "name": "AuthService",
+                "methods": [
+                  {
+                    "name": "constructor",
+                    "kind": "constructor",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "unknown",
+                        "type": "any"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "currentEmployee",
+                    "kind": "get",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "isAuthenticated",
+                    "kind": "get",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "login",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "email",
+                        "type": "string"
+                      },
+                      {
+                        "name": "password",
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "logout",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "currentEmployeeSubject",
+                    "static": false
+                  },
+                  {
+                    "name": "currentEmployee$",
+                    "static": false
+                  },
+                  {
+                    "name": "isAuthenticatedSubject",
+                    "static": false
+                  },
+                  {
+                    "name": "isAuthenticated$",
+                    "static": false
+                  }
+                ],
+                "line": 10
+              },
+              "newSignature": {
+                "type": "classes",
+                "name": "AuthService",
+                "methods": [
+                  {
+                    "name": "constructor",
+                    "kind": "constructor",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "unknown",
+                        "type": "any"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "currentEmployee",
+                    "kind": "get",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "isAuthenticated",
+                    "kind": "get",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "login",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "credentials",
+                        "type": "unknown"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "logout",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "currentEmployeeSubject",
+                    "static": false
+                  },
+                  {
+                    "name": "currentEmployee$",
+                    "static": false
+                  },
+                  {
+                    "name": "isAuthenticatedSubject",
+                    "static": false
+                  },
+                  {
+                    "name": "isAuthenticated$",
+                    "static": false
+                  }
+                ],
+                "line": 10
+              },
+              "details": []
+            }
+          ],
+          "directlyAffected": 0,
+          "totalAffected": 0,
+          "affectedFiles": [],
+          "severity": "LOW",
+          "recommendation": {
+            "action": "APPROVE",
+            "reason": "No breaking changes detected"
+          }
+        },
+        {
+          "changedFile": "src/app/services/user.service.ts",
+          "apiChanges": [
+            {
+              "type": "MODIFIED",
+              "category": "classes",
+              "name": "UserService",
+              "severity": "LOW",
+              "breaking": false,
+              "oldSignature": {
+                "type": "classes",
+                "name": "UserService",
+                "methods": [
+                  {
+                    "name": "constructor",
+                    "kind": "constructor",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "getUsers",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "getUserById",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "addUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "user",
+                        "type": "Omit"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "updateUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      },
+                      {
+                        "name": "updatedUser",
+                        "type": "Partial"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "deleteUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "suspendUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "activateUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      }
+                    ]
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "usersSubject",
+                    "static": false
+                  },
+                  {
+                    "name": "users$",
+                    "static": false
+                  },
+                  {
+                    "name": "mockUsers",
+                    "static": false
+                  }
+                ],
+                "line": 8
+              },
+              "newSignature": {
+                "type": "classes",
+                "name": "UserService",
+                "methods": [
+                  {
+                    "name": "constructor",
+                    "kind": "constructor",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "getUsers",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": []
+                  },
+                  {
+                    "name": "getUserById",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "unknown"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "addUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "user",
+                        "type": "Omit"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "updateUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      },
+                      {
+                        "name": "updatedUser",
+                        "type": "Partial"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "deleteUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "suspendUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "activateUser",
+                    "kind": "method",
+                    "static": false,
+                    "async": false,
+                    "params": [
+                      {
+                        "name": "id",
+                        "type": "string"
+                      }
+                    ]
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "usersSubject",
+                    "static": false
+                  },
+                  {
+                    "name": "users$",
+                    "static": false
+                  },
+                  {
+                    "name": "mockUsers",
+                    "static": false
+                  }
+                ],
+                "line": 8
+              },
+              "details": []
+            }
+          ],
+          "directlyAffected": 0,
+          "totalAffected": 0,
+          "affectedFiles": [],
+          "severity": "LOW",
+          "recommendation": {
+            "action": "APPROVE",
+            "reason": "No breaking changes detected"
+          }
+        }
+      ],
+      "circularDependencies": [],
+      "recommendation": {
+        "action": "APPROVE",
+        "reason": "No breaking changes detected"
+      }
     },
     "callGraph": {
       "summary": {
         "functionsAnalyzed": 107,
         "totalCallSites": 101,
-        "incompatibleCalls": 0
+        "signatureChanges": 2,
+        "incompatibleCalls": 1
       },
-      "analyses": []
+      "signatureChanges": [
+        {
+          "file": "src/app/services/auth.service.ts",
+          "functionName": "login",
+          "oldSignature": "login(email: string, password: string)",
+          "newSignature": "login(credentials: unknown)",
+          "breaking": true,
+          "callSites": 1,
+          "incompatibleCalls": 1,
+          "incompatibilities": [
+            {
+              "file": "src\\app\\components\\auth\\login.component.ts",
+              "line": 31,
+              "reason": "Too many arguments (expected max 1, got 2)",
+              "currentCall": "function call at line 31",
+              "suggestion": "Update call to: login(credentials)",
+              "severity": "CRITICAL"
+            }
+          ],
+          "severity": "CRITICAL"
+        },
+        {
+          "file": "src/app/services/user.service.ts",
+          "functionName": "getUserById",
+          "oldSignature": "getUserById(id: string)",
+          "newSignature": "getUserById(id: unknown)",
+          "breaking": true,
+          "callSites": 2,
+          "incompatibleCalls": 0,
+          "incompatibilities": [],
+          "severity": "HIGH"
+        }
+      ]
     },
     "contracts": {
       "summary": {
@@ -89,7 +580,8 @@
         "interfacesTracked": 6,
         "implementationsTracked": 7
       },
-      "violations": []
+      "violations": [],
+      "recommendation": "APPROVE"
     },
     "stateMutations": {
       "summary": {
@@ -98,7 +590,8 @@
         "highRiskMutations": 0
       },
       "mutations": [],
-      "sharedState": []
+      "sharedState": [],
+      "recommendation": "APPROVE"
     },
     "performance": {
       "summary": {
@@ -106,11 +599,14 @@
         "errors": 0,
         "warnings": 0,
         "bundleImpact": {
-          "estimatedSizeDelta": "0 KB",
-          "largeFiles": []
+          "estimatedSizeDelta": "0.00 KB",
+          "largeFiles": [],
+          "threshold": "100 KB",
+          "exceeds": false
         }
       },
-      "antiPatterns": []
+      "antiPatterns": [],
+      "recommendation": "APPROVE"
     }
   }
 }

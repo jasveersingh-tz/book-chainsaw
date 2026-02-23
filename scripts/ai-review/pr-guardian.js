@@ -90,15 +90,43 @@ async function main() {
     console.log('📞 [2/5] Call Graph Analysis...');
     const callAnalyzer = new CallGraphAnalyzer();
     await callAnalyzer.buildCallGraph(files);
-    results.callGraph = {
-      summary: {
-        functionsAnalyzed: callAnalyzer.functionSignatures.size,
-        totalCallSites: callAnalyzer.callGraph.size,
-        incompatibleCalls: 0,
-      },
-      analyses: [],
-    };
-    console.log(`   ✓ Tracked ${callAnalyzer.callGraph.size} function calls`);
+
+    // Detect signature changes in modified files
+    let signatureBreakingChanges = [];
+    if (changedFiles.length > 0) {
+      signatureBreakingChanges = await callAnalyzer.analyzeChangedSignatures(changedFiles);
+      const totalIncompatible = signatureBreakingChanges.reduce(
+        (sum, c) => sum + c.incompatibleCalls,
+        0,
+      );
+
+      results.callGraph = {
+        summary: {
+          functionsAnalyzed: callAnalyzer.functionSignatures.size,
+          totalCallSites: callAnalyzer.callGraph.size,
+          signatureChanges: signatureBreakingChanges.length,
+          incompatibleCalls: totalIncompatible,
+        },
+        signatureChanges: signatureBreakingChanges,
+      };
+
+      console.log(`   ✓ Tracked ${callAnalyzer.callGraph.size} function calls`);
+      if (signatureBreakingChanges.length > 0) {
+        console.log(`   ⚠️  Found ${signatureBreakingChanges.length} function signature changes`);
+        console.log(`   ⚠️  Found ${totalIncompatible} incompatible call sites`);
+      }
+    } else {
+      results.callGraph = {
+        summary: {
+          functionsAnalyzed: callAnalyzer.functionSignatures.size,
+          totalCallSites: callAnalyzer.callGraph.size,
+          signatureChanges: 0,
+          incompatibleCalls: 0,
+        },
+        signatureChanges: [],
+      };
+      console.log(`   ✓ Tracked ${callAnalyzer.callGraph.size} function calls`);
+    }
     console.log();
 
     // 3. CONTRACT VERIFICATION
@@ -277,6 +305,7 @@ function printReport(decision, results) {
   if (results.callGraph?.summary) {
     console.log('   Call Graph:');
     console.log(`     - Functions tracked: ${results.callGraph.summary.functionsAnalyzed}`);
+    console.log(`     - Signature changes: ${results.callGraph.summary.signatureChanges || 0}`);
     console.log(`     - Incompatible calls: ${results.callGraph.summary.incompatibleCalls}`);
   }
 

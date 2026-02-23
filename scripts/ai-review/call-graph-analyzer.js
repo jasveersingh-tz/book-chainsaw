@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const { parse } = require('@typescript-eslint/parser');
+const { execSync } = require('child_process');
 
 /**
  * Call Graph Analyzer
@@ -9,6 +10,7 @@ class CallGraphAnalyzer {
   constructor() {
     this.callGraph = new Map(); // function -> call sites
     this.functionSignatures = new Map(); // function -> signature
+    this.changedSignatures = new Map(); // file -> changed functions
   }
 
   /**
@@ -370,6 +372,212 @@ class CallGraphAnalyzer {
     if (incompatibleCalls > 5) return 'HIGH';
     if (incompatibleCalls > 0) return 'MEDIUM';
     return 'LOW';
+  }
+
+  /**
+   * Detect signature changes in modified files by comparing with git HEAD
+   */
+  async detectSignatureChanges(changedFiles) {
+    const changes = [];
+
+    for (const file of changedFiles) {
+      try {
+        // Get old version from git
+        const oldContent = execSync(`git show HEAD:${file}`, { encoding: 'utf-8' });
+        const newContent = await fs.readFile(file, 'utf-8');
+
+        // Parse both versions
+        const oldSignatures = await this.extractSignatures(oldContent, file);
+        const newSignatures = await this.extractSignatures(newContent, file);
+
+        // Compare signatures
+        for (const [funcName, newSig] of newSignatures) {
+          const oldSig = oldSignatures.get(funcName);
+
+          if (oldSig && this.signaturesChanged(oldSig, newSig)) {
+            changes.push({
+              file,
+              functionName: funcName,
+              oldSignature: oldSig,
+              newSignature: newSig,
+              breaking: this.isBreakingChange(oldSig, newSig),
+            });
+          }
+        }
+      } catch (error) {
+        // File might be new or git might not be available
+        continue;
+      }
+    }
+
+    return changes;
+  }
+
+  /**
+   * Extract function signatures from code
+   */
+  async extractSignatures(content, filePath) {
+    const signatures = new Map();
+
+    try {
+      const ast = parse(content, {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+        loc: true,
+        range: true,
+      });
+
+      this.traverseASTForSignatures(ast, signatures);
+    } catch (error) {
+      // Parse error, skip this file
+    }
+
+    return signatures;
+  }
+
+  /**
+   * Traverse AST to extract signatures
+   */
+  traverseASTForSignatures(node, signatures) {
+    if (!node || typeof node !== 'object') return;
+
+    // Function declarations
+    if (node.type === 'FunctionDeclaration' && node.id) {
+      signatures.set(node.id.name, this.extractFunctionSignature(node));
+    }
+
+    // Method definitions
+    if (node.type === 'MethodDefinition' && node.key) {
+      signatures.set(node.key.name, this.extractMethodSignature(node));
+    }
+
+    // Recurse
+    for (const key in node) {
+      if (key === 'loc' || key === 'range') continue;
+      const child = node[key];
+      if (Array.isArray(child)) {
+        child.forEach((c) => this.traverseASTForSignatures(c, signatures));
+      } else if (typeof child === 'object') {
+        this.traverseASTForSignatures(child, signatures);
+      }
+    }
+  }
+
+  /**
+   * Check if two signatures are different
+   */
+  signaturesChanged(oldSig, newSig) {
+    // Check parameter count
+    if (oldSig.params.length !== newSig.params.length) return true;
+
+    // Check parameter types
+    for (let i = 0; i < oldSig.params.length; i++) {
+      if (oldSig.params[i].type !== newSig.params[i].type) return true;
+      if (oldSig.params[i].optional !== newSig.params[i].optional) return true;
+    }
+
+    // Check return type
+    if (oldSig.returnType !== newSig.returnType) return true;
+
+    return false;
+  }
+
+  /**
+   * Determine if signature change is breaking
+   */
+  isBreakingChange(oldSig, newSig) {
+    // More required params = breaking
+    const oldRequired = oldSig.params.filter((p) => !p.optional).length;
+    const newRequired = newSig.params.filter((p) => !p.optional).length;
+    if (newRequired > oldRequired) return true;
+
+    // Fewer total params might break existing calls
+    if (newSig.params.length < oldSig.params.length) return true;
+
+    // Changed parameter types = breaking
+    for (let i = 0; i < Math.min(oldSig.params.length, newSig.params.length); i++) {
+      if (oldSig.params[i].type !== newSig.params[i].type) return true;
+    }
+
+    // Changed return type could be breaking
+    if (
+      oldSig.returnType !== newSig.returnType &&
+      oldSig.returnType !== 'any' &&
+      newSig.returnType !== 'any'
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Analyze changed signatures and find incompatible call sites
+   */
+  async analyzeChangedSignatures(changedFiles) {
+    const signatureChanges = await this.detectSignatureChanges(changedFiles);
+    const results = [];
+
+    for (const change of signatureChanges) {
+      // Find all call sites for this function
+      const callSites = [];
+      for (const [funcName, sites] of this.callGraph) {
+        if (funcName === change.functionName || funcName.endsWith(`.${change.functionName}`)) {
+          callSites.push(...sites);
+        }
+      }
+
+      // Validate each call site
+      const incompatibilities = [];
+      for (const call of callSites) {
+        const validation = this.validateCall(call, change.newSignature);
+        if (!validation.valid) {
+          incompatibilities.push({
+            file: call.file,
+            line: call.line,
+            reason: validation.reason,
+            currentCall: call.code,
+            suggestion: validation.suggestion,
+            severity: change.breaking ? 'CRITICAL' : validation.severity,
+          });
+        }
+      }
+
+      if (incompatibilities.length > 0 || change.breaking) {
+        results.push({
+          file: change.file,
+          functionName: change.functionName,
+          oldSignature: this.formatSignature(change.oldSignature),
+          newSignature: this.formatSignature(change.newSignature),
+          breaking: change.breaking,
+          callSites: callSites.length,
+          incompatibleCalls: incompatibilities.length,
+          incompatibilities,
+          severity: change.breaking && incompatibilities.length > 0 ? 'CRITICAL' : 'HIGH',
+        });
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Format signature for display
+   */
+  formatSignature(sig) {
+    const params = sig.params
+      .map((p) => {
+        let param = p.name;
+        if (p.type) param += `: ${p.type}`;
+        if (p.optional) param += '?';
+        if (p.defaultValue) param += ` = ${p.defaultValue}`;
+        return param;
+      })
+      .join(', ');
+
+    let result = `${sig.name}(${params})`;
+    if (sig.returnType) result += `: ${sig.returnType}`;
+    return result;
   }
 
   /**

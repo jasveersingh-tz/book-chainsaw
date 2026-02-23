@@ -37,8 +37,9 @@ export class AuthService {
         return this.isAuthenticatedSubject.value;
     }
 
-    public login(email: string, password: string): boolean {
+    public login(credentials: { email: string; password: string }): boolean {
         // Mock authentication - in production, call a real API
+        const { email, password } = credentials;
         const mockEmployees: Employee[] = [
             {
                 id: '1',
