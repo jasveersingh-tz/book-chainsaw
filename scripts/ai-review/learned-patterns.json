@@ -1,0 +1,337 @@
+{
+  "approvedPatterns": [
+    {
+      "prNumber": "2",
+      "commits": 1,
+      "type": "other",
+      "wasApproved": true,
+      "hadIssues": false,
+      "totalFiles": 31,
+      "totalLinesAdded": 70,
+      "totalLinesDeleted": 309,
+      "subjects": [
+        "Merge pull request #2 from jasveersingh-tz/bugfix/employee-list-fix"
+      ]
+    }
+  ],
+  "rejectedPatterns": [],
+  "reviewerFeedback": [
+    {
+      "keyword": "fix",
+      "context": "fix: improve GitHub Actions workflow reliability and debugging",
+      "type": "fix",
+      "filesAffected": 4,
+      "frequency": 3,
+      "contexts": [
+        "fix: improve GitHub Actions workflow reliability and debugging",
+        "fix: resolve critical memory leaks and add performance optimizations",
+        "fix: resolve GitHub Actions workflow syntax errors and undefined values"
+      ]
+    },
+    {
+      "keyword": "fix",
+      "context": "Merge pull request #2 from jasveersingh-tz/bugfix/employee-list-fix",
+      "type": "other",
+      "filesAffected": 31,
+      "frequency": 2,
+      "contexts": [
+        "Merge pull request #2 from jasveersingh-tz/bugfix/employee-list-fix",
+        "remove tailwind and add bootstrap and autoprefixer"
+      ]
+    },
+    {
+      "keyword": "enhance",
+      "context": "Merge pull request #2 from jasveersingh-tz/bugfix/employee-list-fix",
+      "type": "other",
+      "filesAffected": 31,
+      "frequency": 2,
+      "contexts": [
+        "Merge pull request #2 from jasveersingh-tz/bugfix/employee-list-fix",
+        "Enhanced search functionality in employee list component"
+      ]
+    },
+    {
+      "keyword": "add",
+      "context": "fix: improve GitHub Actions workflow reliability and debugging",
+      "type": "fix",
+      "filesAffected": 4,
+      "frequency": 2,
+      "contexts": [
+        "fix: improve GitHub Actions workflow reliability and debugging",
+        "fix: resolve critical memory leaks and add performance optimizations"
+      ]
+    },
+    {
+      "keyword": "resolve",
+      "context": "fix: resolve critical memory leaks and add performance optimizations",
+      "type": "fix",
+      "filesAffected": 9,
+      "frequency": 2,
+      "contexts": [
+        "fix: resolve critical memory leaks and add performance optimizations",
+        "fix: resolve GitHub Actions workflow syntax errors and undefined values"
+      ]
+    },
+    {
+      "keyword": "remove",
+      "context": "remove ai.yeml close bracket issue",
+      "type": "other",
+      "filesAffected": 4,
+      "frequency": 2,
+      "contexts": [
+        "remove ai.yeml close bracket issue",
+        "remove tailwind and add bootstrap and autoprefixer"
+      ]
+    },
+    {
+      "keyword": "bug",
+      "context": "Merge pull request #2 from jasveersingh-tz/bugfix/employee-list-fix",
+      "type": "other",
+      "filesAffected": 31,
+      "frequency": 1,
+      "contexts": [
+        "Merge pull request #2 from jasveersingh-tz/bugfix/employee-list-fix"
+      ]
+    },
+    {
+      "keyword": "upgrade",
+      "context": "Upgrade PR policy to require a more comprehensive review process, including:",
+      "type": "other",
+      "filesAffected": 20,
+      "frequency": 1,
+      "contexts": [
+        "Upgrade PR policy to require a more comprehensive review process, including:"
+      ]
+    },
+    {
+      "keyword": "remove",
+      "context": "chore: remove test files and testing from CI workflow",
+      "type": "chore",
+      "filesAffected": 3,
+      "frequency": 1,
+      "contexts": [
+        "chore: remove test files and testing from CI workflow"
+      ]
+    },
+    {
+      "keyword": "improve",
+      "context": "fix: improve GitHub Actions workflow reliability and debugging",
+      "type": "fix",
+      "filesAffected": 4,
+      "frequency": 1,
+      "contexts": [
+        "fix: improve GitHub Actions workflow reliability and debugging"
+      ]
+    },
+    {
+      "keyword": "bug",
+      "context": "fix: improve GitHub Actions workflow reliability and debugging",
+      "type": "fix",
+      "filesAffected": 4,
+      "frequency": 1,
+      "contexts": [
+        "fix: improve GitHub Actions workflow reliability and debugging"
+      ]
+    },
+    {
+      "keyword": "memory leak",
+      "context": "fix: resolve critical memory leaks and add performance optimizations",
+      "type": "fix",
+      "filesAffected": 9,
+      "frequency": 1,
+      "contexts": [
+        "fix: resolve critical memory leaks and add performance optimizations"
+      ]
+    },
+    {
+      "keyword": "performance",
+      "context": "fix: resolve critical memory leaks and add performance optimizations",
+      "type": "fix",
+      "filesAffected": 9,
+      "frequency": 1,
+      "contexts": [
+        "fix: resolve critical memory leaks and add performance optimizations"
+      ]
+    },
+    {
+      "keyword": "remove",
+      "context": "fix: resolve GitHub Actions workflow syntax errors and undefined values",
+      "type": "fix",
+      "filesAffected": 1,
+      "frequency": 1,
+      "contexts": [
+        "fix: resolve GitHub Actions workflow syntax errors and undefined values"
+      ]
+    },
+    {
+      "keyword": "issue",
+      "context": "remove ai.yeml close bracket issue",
+      "type": "other",
+      "filesAffected": 4,
+      "frequency": 1,
+      "contexts": [
+        "remove ai.yeml close bracket issue"
+      ]
+    },
+    {
+      "keyword": "add",
+      "context": "feat(components): enhance lifecycle management and add comprehensive validation",
+      "type": "feature",
+      "filesAffected": 4,
+      "frequency": 1,
+      "contexts": [
+        "feat(components): enhance lifecycle management and add comprehensive validation"
+      ]
+    },
+    {
+      "keyword": "enhance",
+      "context": "feat(components): enhance lifecycle management and add comprehensive validation",
+      "type": "feature",
+      "filesAffected": 4,
+      "frequency": 1,
+      "contexts": [
+        "feat(components): enhance lifecycle management and add comprehensive validation"
+      ]
+    },
+    {
+      "keyword": "improve",
+      "context": "Clean up and improvement in code",
+      "type": "other",
+      "filesAffected": 29,
+      "frequency": 1,
+      "contexts": [
+        "Clean up and improvement in code"
+      ]
+    },
+    {
+      "keyword": "downgrade",
+      "context": "downgrade typescript to 5.5.4",
+      "type": "other",
+      "filesAffected": 2,
+      "frequency": 1,
+      "contexts": [
+        "downgrade typescript to 5.5.4"
+      ]
+    },
+    {
+      "keyword": "add",
+      "context": "remove tailwind and add bootstrap and autoprefixer",
+      "type": "other",
+      "filesAffected": 7,
+      "frequency": 1,
+      "contexts": [
+        "remove tailwind and add bootstrap and autoprefixer"
+      ]
+    }
+  ],
+  "breakingChangePatterns": [
+    {
+      "indicator": "remove",
+      "commit": "chore: remove test files and testing from CI workflow",
+      "files": [
+        ".github/workflows/ai-code-review.yml",
+        "src/app/app.spec.ts",
+        "src/app/utils/validation.utils.spec.ts"
+      ],
+      "pattern": {
+        "hasTests": true,
+        "hasComponents": false,
+        "hasServices": false,
+        "hasModels": false,
+        "hasConfig": false,
+        "fileTypes": [
+          ".yml",
+          ".ts"
+        ]
+      }
+    },
+    {
+      "indicator": "remove",
+      "commit": "fix: resolve GitHub Actions workflow syntax errors and undefined values",
+      "files": [
+        ".github/workflows/ai-code-review.yml"
+      ],
+      "pattern": {
+        "hasTests": false,
+        "hasComponents": false,
+        "hasServices": false,
+        "hasModels": false,
+        "hasConfig": false,
+        "fileTypes": [
+          ".yml"
+        ]
+      }
+    },
+    {
+      "indicator": "remove",
+      "commit": "remove ai.yeml close bracket issue",
+      "files": [
+        ".github/workflows/ai-code-review.yml",
+        "package-lock.json",
+        "src/app/utils/validation.utils.spec.ts",
+        "src/app/utils/validation.utils.ts"
+      ],
+      "pattern": {
+        "hasTests": true,
+        "hasComponents": false,
+        "hasServices": false,
+        "hasModels": false,
+        "hasConfig": true,
+        "fileTypes": [
+          ".yml",
+          ".json",
+          ".ts"
+        ]
+      }
+    },
+    {
+      "indicator": "remove",
+      "commit": "remove tailwind and add bootstrap and autoprefixer",
+      "files": [
+        ".postcssrc.json",
+        "FINAL_STATUS.md",
+        "package-lock.json",
+        "package.json",
+        "src/app/app.html",
+        "src/index.html",
+        "src/styles.css"
+      ],
+      "pattern": {
+        "hasTests": false,
+        "hasComponents": false,
+        "hasServices": false,
+        "hasModels": false,
+        "hasConfig": true,
+        "fileTypes": [
+          ".json",
+          ".md",
+          ".html",
+          ".css"
+        ]
+      }
+    }
+  ],
+  "codeQualityRules": [
+    {
+      "keyword": "memory leak",
+      "severity": "critical",
+      "category": "performance",
+      "occurrences": 1,
+      "affectedFiles": [
+        ".../components/employees/employees.component.html",
+        ".../components/employees/employees.component.ts",
+        ".../components/inventory/inventory.component.html",
+        ".../components/inventory/inventory.component.ts",
+        "src/app/components/pos/pos.component.html",
+        "src/app/components/pos/pos.component.ts",
+        "src/app/components/shared/layout.component.ts",
+        "src/app/components/users/users.component.html",
+        "src/app/components/users/users.component.ts"
+      ],
+      "shouldBlock": true
+    }
+  ],
+  "lastUpdated": "2026-02-23T10:48:56.202Z",
+  "totalPRsAnalyzed": 1,
+  "version": "1.0.0"
+}

@@ -19,8 +19,19 @@ class CallGraphAnalyzer {
   async buildCallGraph(files) {
     console.log(`Building call graph for ${files.length} files...`);
 
+    const maxFileSize = 5 * 1024 * 1024; // 5MB limit
+
     for (const file of files) {
       try {
+        // Check file size before reading
+        const stats = await fs.stat(file);
+        if (stats.size > maxFileSize) {
+          console.warn(
+            `⚠️  Skipping large file ${file} (${(stats.size / 1024 / 1024).toFixed(2)}MB)`,
+          );
+          continue;
+        }
+
         const content = await fs.readFile(file, 'utf-8');
         await this.analyzeFile(content, file);
       } catch (error) {
@@ -382,8 +393,12 @@ class CallGraphAnalyzer {
 
     for (const file of changedFiles) {
       try {
-        // Get old version from git
-        const oldContent = execSync(`git show HEAD:${file}`, { encoding: 'utf-8' });
+        // Get old version from git with timeout and size limit
+        const oldContent = execSync(`git show HEAD:${file}`, {
+          encoding: 'utf-8',
+          maxBuffer: 5 * 1024 * 1024,
+          timeout: 30000,
+        });
         const newContent = await fs.readFile(file, 'utf-8');
 
         // Parse both versions
@@ -405,7 +420,10 @@ class CallGraphAnalyzer {
           }
         }
       } catch (error) {
-        // File might be new or git might not be available
+        // File might be new, deleted, or too large - skip gracefully
+        if (error.message && !error.message.includes('does not exist')) {
+          console.warn(`\u26a0\ufe0f  Could not analyze ${file}: ${error.message}`);
+        }
         continue;
       }
     }

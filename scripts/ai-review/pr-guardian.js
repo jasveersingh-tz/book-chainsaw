@@ -9,6 +9,7 @@ const ContractVerifier = require('./contract-verifier');
 const StateMutationTracker = require('./state-mutation-tracker');
 const PerformanceAnalyzer = require('./performance-analyzer');
 const MergeDecisionEngine = require('./merge-decision-engine');
+const PRLearningAnalyzer = require('./pr-learning-analyzer');
 
 /**
  * Comprehensive PR Guardian Analyzer
@@ -20,6 +21,11 @@ async function main() {
 
   const projectPath = process.cwd();
   const startTime = Date.now();
+
+  // Initialize learning system (runs automatically every 10th execution)
+  const learningAnalyzer = new PRLearningAnalyzer();
+  const learnedPatterns = await learningAnalyzer.run();
+  console.log();
 
   try {
     // Get all TypeScript/JavaScript files
@@ -206,11 +212,25 @@ async function main() {
 
     // MERGE DECISION
     console.log('⚖️  Making Merge Decision...\n');
+
+    // Apply learned patterns to improve decision
+    const currentAnalysis = {
+      type: determineChangeType(changedFiles),
+      files: changedFiles.length || files.length,
+      dependencies: results.dependencyGraph?.summary?.criticalIssues || 0,
+      contracts: results.contracts?.summary?.criticalViolations || 0,
+      state: results.stateMutations?.summary?.totalMutations || 0,
+      performance: results.performance?.summary?.totalIssues || 0,
+    };
+
+    const learningAdjustments = learningAnalyzer.applyLearnedPatterns(currentAnalysis);
+
     const decisionEngine = new MergeDecisionEngine({
       criticalIssuesMax: 0,
       highIssuesMax: 5,
       breakingChangesMax: 0,
       minScore: 70,
+      learningAdjustments, // Pass learning insights
     });
 
     const decision = decisionEngine.generateReport(results);
@@ -242,6 +262,26 @@ async function main() {
     console.error(error.stack);
     process.exit(1);
   }
+}
+
+/**
+ * Determine the type of change based on file patterns and names
+ */
+function determineChangeType(files) {
+  if (!files || files.length === 0) return 'other';
+
+  const fileNames = files.join(' ').toLowerCase();
+
+  if (fileNames.includes('fix')) return 'fix';
+  if (fileNames.includes('feat')) return 'feature';
+  if (fileNames.includes('refactor')) return 'refactor';
+  if (fileNames.includes('test') || fileNames.includes('spec')) return 'test';
+  if (fileNames.includes('component')) return 'feature';
+  if (fileNames.includes('service')) return 'feature';
+  if (fileNames.includes('model')) return 'feature';
+  if (fileNames.includes('config') || fileNames.includes('.json')) return 'chore';
+
+  return 'other';
 }
 
 /**
