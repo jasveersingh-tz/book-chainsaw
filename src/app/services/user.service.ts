@@ -54,8 +54,9 @@ export class UserService {
         return this.users$;
     }
 
-    public getUserById(id: string): User | undefined {
-        return this.mockUsers.find((user) => user.id === id);
+    public getUserById(id: string | number): User | undefined {
+        const userId = typeof id === 'number' ? id.toString() : id;
+        return this.mockUsers.find((user) => user.id === userId);
     }
 
     public addUser(user: Omit<User, 'id'>): void {

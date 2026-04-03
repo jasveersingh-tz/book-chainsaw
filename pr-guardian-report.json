@@ -1,28 +1,54 @@
 {
   "decision": {
-    "timestamp": "2026-02-23T08:40:52.446Z",
-    "decision": "APPROVE",
+    "timestamp": "2026-02-23T11:03:20.092Z",
+    "decision": "WARN",
     "score": 100,
-    "reason": "All quality checks passed",
+    "reason": "4 high-severity issues need review",
     "issues": {
       "criticalCount": 0,
-      "highCount": 0,
+      "highCount": 4,
       "mediumCount": 0,
       "lowCount": 0,
       "breakingCount": 0,
       "details": {
         "critical": [],
-        "high": [],
+        "high": [
+          {
+            "type": "breaking-change-pattern",
+            "severity": "high",
+            "message": "This matches a historical breaking change pattern",
+            "source": "learned-pattern"
+          },
+          {
+            "type": "breaking-change-pattern",
+            "severity": "high",
+            "message": "This matches a historical breaking change pattern",
+            "source": "learned-pattern"
+          },
+          {
+            "type": "breaking-change-pattern",
+            "severity": "high",
+            "message": "This matches a historical breaking change pattern",
+            "source": "learned-pattern"
+          },
+          {
+            "type": "breaking-change-pattern",
+            "severity": "high",
+            "message": "This matches a historical breaking change pattern",
+            "source": "learned-pattern"
+          }
+        ],
         "medium": [],
         "low": [],
         "breaking": []
       }
     },
-    "recommendation": "✅ **APPROVED FOR MERGE**\n\nAll quality checks passed. Safe to merge.",
+    "recommendation": "⚠️ **MERGE WITH CAUTION**\n\n**Recommended Actions:**\n- Review high-severity issues carefully",
     "details": {
       "dependencyGraph": {
         "totalFiles": 24,
         "analyzedFiles": 0,
+        "totalImpacts": 0,
         "criticalIssues": 0,
         "highIssues": 0,
         "breakingChanges": 0
@@ -30,6 +56,7 @@
       "callGraph": {
         "functionsAnalyzed": 107,
         "totalCallSites": 101,
+        "signatureChanges": 0,
         "incompatibleCalls": 0
       },
       "contracts": {
@@ -44,8 +71,10 @@
         "errors": 0,
         "warnings": 0,
         "bundleImpact": {
-          "estimatedSizeDelta": "0 KB",
-          "largeFiles": []
+          "estimatedSizeDelta": "0.00 KB",
+          "largeFiles": [],
+          "threshold": "100 KB",
+          "exceeds": false
         }
       },
       "stateMutations": {
@@ -66,20 +95,26 @@
       "summary": {
         "totalFiles": 24,
         "analyzedFiles": 0,
+        "totalImpacts": 0,
         "criticalIssues": 0,
         "highIssues": 0,
         "breakingChanges": 0
       },
       "impacts": [],
-      "circularDependencies": []
+      "circularDependencies": [],
+      "recommendation": {
+        "action": "APPROVE",
+        "reason": "No breaking changes detected"
+      }
     },
     "callGraph": {
       "summary": {
         "functionsAnalyzed": 107,
         "totalCallSites": 101,
+        "signatureChanges": 0,
         "incompatibleCalls": 0
       },
-      "analyses": []
+      "signatureChanges": []
     },
     "contracts": {
       "summary": {
@@ -89,7 +124,8 @@
         "interfacesTracked": 6,
         "implementationsTracked": 7
       },
-      "violations": []
+      "violations": [],
+      "recommendation": "APPROVE"
     },
     "stateMutations": {
       "summary": {
@@ -98,7 +134,8 @@
         "highRiskMutations": 0
       },
       "mutations": [],
-      "sharedState": []
+      "sharedState": [],
+      "recommendation": "APPROVE"
     },
     "performance": {
       "summary": {
@@ -106,11 +143,14 @@
         "errors": 0,
         "warnings": 0,
         "bundleImpact": {
-          "estimatedSizeDelta": "0 KB",
-          "largeFiles": []
+          "estimatedSizeDelta": "0.00 KB",
+          "largeFiles": [],
+          "threshold": "100 KB",
+          "exceeds": false
         }
       },
-      "antiPatterns": []
+      "antiPatterns": [],
+      "recommendation": "APPROVE"
     }
   }
 }

@@ -1,0 +1,53 @@
+# .npmignore - Controls what gets published to NPM
+# CRITICAL: Only publish obfuscated code in lib/, NOT source code in src/
+
+# Source code (DO NOT PUBLISH)
+src/
+scripts/
+tests/
+
+# Development files
+*.log
+*.tmp
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts (only lib/ should be published)
+node_modules/
+coverage/
+.nyc_output/
+
+# Documentation (keep only README and LICENSE)
+TESTING.md
+DEVELOPMENT.md
+*.spec.js
+*.test.js
+
+# Config files
+.eslintrc*
+.prettierrc*
+tsconfig.json
+jest.config.js
+
+# ALLOW THESE (will be published):
+# ✅ lib/               - Obfuscated code
+# ✅ bin/               - CLI wrapper
+# ✅ templates/         - CI/CD templates
+# ✅ README.md          - Documentation
+# ✅ LICENSE            - Legal
+# ✅ package.json       - NPM metadata
